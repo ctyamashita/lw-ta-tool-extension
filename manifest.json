@@ -1,0 +1,24 @@
+{
+    "name": "Le Wagon TA tools - BETA",
+    "version": "1.0",
+    "description": "THIS EXTENSION IS FOR BETA TESTING",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "service_worker.js",
+        "type": "module"
+    },
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "storage",
+        "webRequest",
+        "scripting"
+    ],
+    "host_permissions": [
+        "*://kitt.lewagon.com/*"
+    ],
+    "action": {
+        "default_title": "TA extension",
+        "default_popup": "popup.html"
+    } 
+}

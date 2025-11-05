@@ -1,0 +1,31 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body id="popup">
+    <script defer src="popup.js" type="module"></script>
+    <h2>On Duty (Tickets Page)</h2>
+    <form id="optionsForm">
+      <div class="input-container">
+        <input type="checkbox" name="hideWott" id="hideWott">
+        <label for="hideWott">Hide Wott Chats</label>
+      </div>
+      <div class="input-container">
+        <input type="checkbox" name="autoOnAfterBreak" id="autoOnAfterBreak">
+        <label for="autoOnAfterBreak">Auto On After Break</label>
+      </div>
+    </form>
+    <h2 id="lastCollectionTitle">Tickets</h2>
+    <div class="btn-container">
+      <button id="getTickets">Collect</button>
+      <button id="ticketsIndex">Tickets</button>
+      <button id="clearTickets">Clear</button>
+    </div>
+    <div class="progress-container">
+      <span id="progress-bar"></span>
+      <p id="progress"></p>
+    </div>
+    <small id="currentPageCollection"></small>
+  </body>
+</html>

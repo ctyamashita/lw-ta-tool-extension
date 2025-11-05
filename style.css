@@ -1,0 +1,156 @@
+*:not(i) {
+  font-family: Nunito, 'Helvetica Neue', sans-serif !important;
+}
+
+/* popup */
+html {
+  height: fit-content;
+}
+
+html:has(#popup), #popup {
+  height: fit-content;
+}
+
+#popup .input-container, .collection-container {
+  display: flex;
+  align-items: center;
+  padding: .2em .4em;
+  gap: .4em;
+}
+
+#popup .input-container label {
+  white-space: nowrap;
+}
+
+#popup p {
+  margin: 0;
+}
+
+#popup h2 {
+  margin-bottom: .5rem;
+  font-size: .9rem;
+}
+
+#popup .btn-container {
+  display: flex;
+  gap: 1rem;
+}
+
+#popup .btn-container button {
+  flex-grow: 1;
+}
+
+#popup small {
+  display: block;
+  text-align: center;
+}
+
+#popup button {
+  border: none;
+  background-color: lightgrey;
+  border-radius: 8px;
+  padding: .5rem 1rem;
+  cursor:pointer;
+  color: rgb(60,60,60);
+  font-weight: 600;
+}
+
+#popup button#ticketsIndex:hover {
+  background-color: lightblue;
+}
+
+#popup button#clearTickets:hover {
+  background-color: #d77070;
+}
+
+#popup button#getTickets:hover {
+  background-color: darkkhaki;
+}
+
+#popup button#getTickets[disabled] {
+  filter: grayscale(1);
+  cursor: progress;
+}
+
+#popup .progress-container {
+  position: relative;
+  height: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: .5rem;
+  background-color: #ebebeb;
+  border-radius: 4px;
+}
+
+#popup .progress-container:has(#progress:not([data-progress])) {
+  display: none;
+}
+
+#popup #progress-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: orange;
+  border-radius: 4px;
+  transition: 1s;
+}
+
+#popup #progress-bar.completed {
+  background-color: darkkhaki;
+}
+
+#popup #progress::after {
+  content: attr(data-progress);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* tickets page */
+h1 {
+  padding: 2.5rem 0 1rem !important;
+  border-bottom: solid;
+}
+
+#tickets-dashboard .popover {
+  position: relative !important;
+  height: fit-content;
+}
+
+#tickets-dashboard .ticket-popover-time {
+  font-weight: 700;
+}
+
+#tickets-dashboard details summary h2 {
+  display: inline;
+}
+
+#tickets-dashboard details summary {
+  color: black;
+  padding: 1rem;
+}
+
+#tickets-dashboard details[open] {
+  background-color: white;
+  border-radius: 1rem;
+}
+
+#tickets-dashboard details summary::marker {
+  font-size: 1.5em;
+}
+
+#tickets-dashboard details > div {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 80vh;
+  min-height: unset !important;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem;
+  width: fit-content;
+}
+
+#tickets-dashboard .ticket-popover-body h4 {
+  margin-bottom: .5rem !important;
+}
