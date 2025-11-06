@@ -7,11 +7,18 @@
   <script src="scripts/font-awesome.js" crossorigin="anonymous"></script>
   <title>Document</title>
 </head>
-<body>
+<body id="tickets-dashboard">
   <script defer src="tickets.js" type="module"></script>
   <div class="container">
     <h1>Batch Number</h1>
-    <div id="tickets-dashboard">
+    <h2>🎫 Most Tickets</h2>
+    <ol id="most"></ol>
+    <hr>
+    <h2>⌛ Longest Ticket</h2>
+    <div id="longest"></div>
+    <hr>
+    <h2>All Tickets</h2>
+    <div id="tickets-container">
       No data
     </div>
   </div>
