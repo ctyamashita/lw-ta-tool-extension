@@ -90,7 +90,7 @@ if (currentBatch) {
         </div>`
       )
 
-      title.innerHTML = `<h2>${ticket.dayLecture} (${tabContent.childNodes.length})</h2>`
+      title.innerHTML = `<h3>${ticket.dayLecture} (${tabContent.childNodes.length})</h3>`
     })
 
     // most Tickets
@@ -117,17 +117,34 @@ if (currentBatch) {
 
     const picky = {}
     const favorites = {}
+    const createdByTA = {}
     allTickets.forEach(ticket=>{
       const isPreferredTeacherPresent = ticket.querySelector('.pref-teacher')
       if (isPreferredTeacherPresent) {
+        const ticketText = ticket.querySelector('.ticket-popover-body')
+        const notCreatedByTA = Array.from(ticketText.childNodes).filter(child=>child.nodeName == '#text' ).map(el=>el.data.trim()).filter(e=>e.length > 0 ).join().length > 20
+
         const teacher = ticket.querySelector('.popover-pref-teacher-img').src
-        const student = ticket.querySelector('.ticket-popover-student strong').innerHTML.trim();
-        picky[student] ||= 0
-        picky[student]++
-        favorites[teacher] ||= 0
-        favorites[teacher]++
+        if (notCreatedByTA) {
+          const student = ticket.querySelector('.ticket-popover-student strong').innerHTML.trim();
+          picky[student] ||= 0
+          picky[student]++
+          favorites[teacher] ||= 0
+          favorites[teacher]++
+        } else {
+          createdByTA[teacher] ||= 0
+          createdByTA[teacher]++
+        }
       }
     })
+
+    // Tickets by TA
+    const sortedCreatedByTA = descOrderEntriesByValue(createdByTA)
+    sortedCreatedByTA.forEach(teacher=>{
+      const [teacherImg, count] = teacher
+      document.querySelector('#created').insertAdjacentHTML('beforeend', `<span><img class="favorite-ta" src="${teacherImg}" /><strong>${count}<strong> <small>tickets</small></span>`)
+    })
+
     // favorite
     const sortedFavorites = descOrderEntriesByValue(favorites)
     sortedFavorites.forEach(favorite=>{

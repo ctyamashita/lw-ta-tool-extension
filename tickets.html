@@ -11,17 +11,30 @@
   <script defer src="tickets.js" type="module"></script>
   <div class="container">
     <h1>Batch Number</h1>
-    <h2>⌛ Longest Ticket</h2>
-    <div id="longest"></div>
-    <hr>
-    <h2>🎫 Most Tickets</h2>
-    <ol id="most"></ol>
-    <hr>
-    <h2>❤️ Preferred TA's</h2>
-    <div id="favorite"></div>
-    <hr>
-    <h2>👉 Most tickets with Preferred TA</h2>
-    <ol id="picky"></ol>
+    <div class="flex-container">
+      <div>
+        <h2>⌛ Longest Ticket</h2>
+        <div id="longest"></div>
+      </div>
+      <div>
+        <h2>🎫 Most Tickets</h2>
+        <ol id="most"></ol>
+      </div>
+      <div>
+        <h2>👉 Most tickets with Preferred TA</h2>
+        <ol id="picky"></ol>
+      </div>
+      <div>
+        <h2>❤️ Preferred TA's</h2>
+        <div id="favorite"></div>
+        <small>May not be accurate based on tickets with content with more than 20 characters.</small>
+      </div>
+      <div>
+        <h2>🚀 Created by TA</h2>
+        <div id="created"></div>
+        <small>May not be accurate based on tickets with content with less than 20 characters.</small>
+      </div>
+    </div>
     <hr>
     <details>
       <summary>

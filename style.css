@@ -116,6 +116,31 @@ h1 {
   border-bottom: solid;
 }
 
+h2 {
+  margin-bottom: 1rem !important;
+  padding-bottom: 8px;
+  border-bottom: solid lightgray;
+}
+
+summary:has(h2,h3) {
+  border-bottom: solid lightgray;
+}
+summary h2 {
+  border-bottom: none;
+}
+
+li {
+  margin-bottom: .5rem;
+}
+
+details details {
+  margin: 0 1rem;
+}
+
+details details[open] summary {
+  margin: 1rem 0;
+}
+
 .popover {
   position: relative !important;
   height: fit-content;
@@ -134,36 +159,41 @@ h1 {
   margin: 8px auto;
 }
 
+.flex-container {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin: 3rem 0;
+  flex-wrap: wrap;
+}
+
 #longest {
   display: flex;
   justify-content: center;
 }
 
-#favorite {
+#favorite, #created {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
-#tickets-dashboard .container {
-  max-width: 600px;
-}
-
 #tickets-dashboard .ticket-popover-time {
   font-weight: 700;
 }
 
-#tickets-dashboard details summary h2 {
+#tickets-dashboard details summary h2, 
+#tickets-dashboard details summary h3 {
   display: inline;
 }
 
-#tickets-dashboard #tickets-container details summary {
+#tickets-dashboard details summary {
   color: black;
   padding: 1rem;
 }
 
-#tickets-dashboard #tickets-container details[open] {
+#tickets-dashboard details details[open] {
   background-color: white;
   border-radius: 1rem;
 }
