@@ -11,7 +11,6 @@
         "tabs",
         "activeTab",
         "storage",
-        "webRequest",
         "scripting"
     ],
     "host_permissions": [
