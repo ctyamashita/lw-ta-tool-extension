@@ -95,13 +95,13 @@ if (currentBatch) {
     sortedCount.slice(0,5).forEach(student=>{
       const [ name, amount ] = student
       const ticketsPerDay = Math.round(amount / totalDays * 10) / 10
-      document.querySelector("#most").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} Tickets (${ticketsPerDay}/day)</li>`)
+      document.querySelector("#most").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} tickets (${ticketsPerDay}/day)</li>`)
     })
 
     // finding longest ticket
-    const allTicketTimes = document.querySelectorAll('.popover');
+    const allTickets = document.querySelectorAll('.popover');
 
-    const sortedTickets = Array.from(allTicketTimes).sort((a,b)=>{
+    const sortedTickets = Array.from(allTickets).sort((a,b)=>{
       const aTime = a.querySelector('.ticket-popover-time')
       const bTime = b.querySelector('.ticket-popover-time')
 
@@ -109,8 +109,34 @@ if (currentBatch) {
     )
     const longestTicket = sortedTickets[0]
     document.querySelector("#longest").appendChild(longestTicket)
-    
-    // console.log(longestTicket)
+
+    // picky
+    const picky = {}
+    // favorite
+    const favorites = {}
+    allTickets.forEach(ticket=>{
+      const isPreferredTeacherPresent = ticket.querySelector('.pref-teacher')
+      if (isPreferredTeacherPresent) {
+        const teacher = ticket.querySelector('.popover-pref-teacher-img').src
+        const student = ticket.querySelector('.ticket-popover-student strong').innerHTML.trim();
+        picky[student] ||= 0
+        picky[student]++
+        favorites[teacher] ||= 0
+        favorites[teacher]++
+      }
+    })
+
+    const sortedFavorites = Object.entries(favorites).sort((a,b)=>b[1] - a[1])
+    sortedFavorites.forEach(favorite=>{
+      const [favoriteImg,favoriteCount] = favorite
+      document.querySelector('#favorite').insertAdjacentHTML('beforeend', `<span><img class="favorite-ta" src="${favoriteImg}" />${favoriteCount} <small>tickets</small></span>`)
+    })
+
+    const sortedPicky = Object.entries(picky).sort((a,b)=>b[1] - a[1])
+    sortedPicky.slice(0,3).forEach(picky=>{
+      const [pickyName,pickyCount] = picky
+      document.querySelector('#picky').insertAdjacentHTML('beforeend', `<li><strong>${pickyName}</strong> - ${pickyCount} tickets</li>`)
+    })
   }
 }
 
