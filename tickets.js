@@ -97,7 +97,7 @@ if (currentBatch) {
     const arrCount = Object.entries(ticketCount).map(entry=>[entry[0], entry[1].ticketCount])
     const sortedCount = arrCount.sort((a,b)=> b[1] - a[1] )
 
-    sortedCount.slice(0,5).forEach(student=>{
+    sortedCount.slice(0,8).forEach(student=>{
       const [ name, amount ] = student
       const ticketsPerDay = Math.round(amount / totalDays * 10) / 10
       document.querySelector("#most").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} tickets (${ticketsPerDay}/day)</li>`)
@@ -154,7 +154,7 @@ if (currentBatch) {
 
     // picky
     const sortedPicky = descOrderEntriesByValue(picky)
-    sortedPicky.slice(0,3).forEach(picky=>{
+    sortedPicky.slice(0,8).forEach(picky=>{
       const [pickyName,pickyCount] = picky
       document.querySelector('#picky').insertAdjacentHTML('beforeend', `<li><strong>${pickyName}</strong> - ${pickyCount} tickets</li>`)
     })
