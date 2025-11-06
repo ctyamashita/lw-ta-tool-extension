@@ -11,6 +11,10 @@ html:has(#popup), #popup {
   height: fit-content;
 }
 
+body > :last-child {
+  margin-bottom: 3rem;
+}
+
 #popup .input-container, .collection-container {
   display: flex;
   align-items: center;
@@ -137,7 +141,13 @@ h1 {
 
 #favorite {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+#tickets-dashboard .container {
+  max-width: 600px;
 }
 
 #tickets-dashboard .ticket-popover-time {

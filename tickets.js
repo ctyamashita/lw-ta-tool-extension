@@ -36,6 +36,10 @@ function stringTimeToIntegerSeconds(string) {
   return totalSec
 }
 
+function descOrderEntriesByValue(obj) {
+  return Object.entries(obj).sort((a,b)=>b[1] - a[1])
+}
+
 const currentBatchResponse = await chrome.storage.local.get('currentBatch')
 let currentBatch = currentBatchResponse.currentBatch
 const ticketsContainer = document.getElementById('tickets-container')
@@ -52,7 +56,8 @@ if (currentBatch) {
   const ticketCount = ticketsData?.ticketCount
 
   // update heading
-  document.querySelector('h1').innerText = `#${currentBatch} Tickets (${tickets?.length || 0})`
+  document.querySelector('h1').innerText = `#${currentBatch} Tickets`
+  document.querySelector('h2#all-tickets').innerText = `All Tickets (${tickets?.length || 0})`
 
   if (tickets) {
     ticketsContainer.innerHTML = ''
@@ -102,17 +107,15 @@ if (currentBatch) {
     const allTickets = document.querySelectorAll('.popover');
 
     const sortedTickets = Array.from(allTickets).sort((a,b)=>{
-      const aTime = a.querySelector('.ticket-popover-time')
-      const bTime = b.querySelector('.ticket-popover-time')
+      const aTime = a.querySelector('.ticket-popover-time').innerHTML
+      const bTime = b.querySelector('.ticket-popover-time').innerHTML
 
-      return stringTimeToIntegerSeconds(bTime.innerHTML) - stringTimeToIntegerSeconds(aTime.innerHTML)}
+      return stringTimeToIntegerSeconds(bTime) - stringTimeToIntegerSeconds(aTime)}
     )
     const longestTicket = sortedTickets[0]
     document.querySelector("#longest").appendChild(longestTicket)
 
-    // picky
     const picky = {}
-    // favorite
     const favorites = {}
     allTickets.forEach(ticket=>{
       const isPreferredTeacherPresent = ticket.querySelector('.pref-teacher')
@@ -125,14 +128,15 @@ if (currentBatch) {
         favorites[teacher]++
       }
     })
-
-    const sortedFavorites = Object.entries(favorites).sort((a,b)=>b[1] - a[1])
+    // favorite
+    const sortedFavorites = descOrderEntriesByValue(favorites)
     sortedFavorites.forEach(favorite=>{
       const [favoriteImg,favoriteCount] = favorite
-      document.querySelector('#favorite').insertAdjacentHTML('beforeend', `<span><img class="favorite-ta" src="${favoriteImg}" />${favoriteCount} <small>tickets</small></span>`)
+      document.querySelector('#favorite').insertAdjacentHTML('beforeend', `<span><img class="favorite-ta" src="${favoriteImg}" /><strong>${favoriteCount}<strong> <small>tickets</small></span>`)
     })
 
-    const sortedPicky = Object.entries(picky).sort((a,b)=>b[1] - a[1])
+    // picky
+    const sortedPicky = descOrderEntriesByValue(picky)
     sortedPicky.slice(0,3).forEach(picky=>{
       const [pickyName,pickyCount] = picky
       document.querySelector('#picky').insertAdjacentHTML('beforeend', `<li><strong>${pickyName}</strong> - ${pickyCount} tickets</li>`)
