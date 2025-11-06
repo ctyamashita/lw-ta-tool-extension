@@ -2,7 +2,7 @@
 ### 1. Clone this repo
 `git clone git@github.com:ctyamashita/lw-ta-tool-extension.git`
 ### 2. On your chrome-based browser open:
-  - <a href="chrome://extensions">Extensions</a>
+  - Extensions (`chrome://extensions`)
   - Enable Developer Mode
   - Load Unpacked
   - Select the repo folder
