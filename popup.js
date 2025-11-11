@@ -2,6 +2,23 @@ import { triggerScript, getCurrentTab, getLeWagonTab, timestamp } from './script
 
 chrome.runtime.connect({ name: "popup" })
 
+const getTicketsBtn = document.getElementById('getTickets');
+const clearTicketsBtn = document.getElementById('clearTickets');
+const ticketsIndexBtn = document.getElementById('ticketsIndex');
+
+function updateStatus(urlsMissing, urlsDone) {
+    if (urlsMissing == 0) {
+        // hiding collect btn
+        getTicketsBtn.setAttribute('style', 'display: none')
+        document.getElementById('collectionStatus').innerText = 'Tickets collection up to date'
+    } else if (urlsDone == 0) {
+        // hiding tickets and clear btn
+        [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+    } else {
+        document.getElementById('collectionStatus').innerText = `Missing ${urlsMissing} days`
+    }
+}
+
 async function listenClick() {
     const leWagonTab = await getLeWagonTab()
     if (!leWagonTab) {
@@ -9,42 +26,19 @@ async function listenClick() {
         return alert('Please have at least one tab opened and logged on Kitt')
     }
 
-    const getTicketsBtn = document.getElementById('getTickets');
-    const clearTicketsBtn = document.getElementById('clearTickets');
-    const ticketsIndexBtn = document.getElementById('ticketsIndex');
-
     chrome.storage.local.get('currentBatch').then(async (currentBatchResponse) => {
         const { currentBatch } = currentBatchResponse
         document.getElementById('currentBatch').innerText = `Batch #${currentBatch}`
         const { onDuty } = await chrome.storage.sync.get('onDuty')
-        if (onDuty) {
-            document.getElementById('onDuty').classList.add('on')
-        }
+        if (onDuty) document.getElementById('onDuty').classList.add('on')
 
         const progressEl = document.getElementById('progress');
         const progressBarEl = document.getElementById('progress-bar');
         const collectionStatus = document.getElementById('collectionStatus')
         chrome.storage.local.get(currentBatch).then(async (batchDataResponse) => {
-            let urls = batchDataResponse[currentBatch]?.urls
+            let urls = batchDataResponse[currentBatch]?.urls || [];
             let urlsDone = batchDataResponse[currentBatch]?.urlsDone || [];
             let urlsMissing = urls.length - urlsDone.length
-            const { lastTimeFetched } = await chrome.storage.local.get('lastTimeFetched')
-            const currentTime = timestamp()
-            const newDay = currentTime != lastTimeFetched
-            if (urls.length == 0 || newDay) {
-                alert('Updating ticket days')
-                chrome.storage.local.set({lastTimeFetched: currentTime})
-                const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: false })
-                chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-                    if (changeInfo.status != 'complete' && statisticsTab.id != tabId) return
-                    // remove tab after completion
-                    chrome.tabs.remove(tabId)
-                })
-                const updatedResponse = await chrome.storage.local.get(currentBatch)
-                urls = updatedResponse[currentBatch].urls
-                urlsDone = updatedResponse[currentBatch]?.urlsDone || [];
-                urlsMissing = urls.length - urlsDone.length
-            }
 
             if (urlsMissing == 0) {
                 // hiding collect btn
@@ -55,6 +49,37 @@ async function listenClick() {
                 [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
             } else {
                 document.getElementById('collectionStatus').innerText = `Missing ${urlsMissing} days`
+            }
+
+            const { lastTimeFetched } = await chrome.storage.local.get('lastTimeFetched')
+            const currentTime = timestamp()
+            const newDay = currentTime != lastTimeFetched
+            if (urls.length == 0 || newDay) {
+                alert('Updating past ticket days')
+                chrome.storage.local.set({lastTimeFetched: currentTime, collecting: true}).then(async()=>{
+                    const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: false })
+                    chrome.tabs.onRemoved.addListener(async (tabId, _removeInfo) => {
+                        if (statisticsTab.id == tabId) {
+                            // remove tab after completion
+                            chrome.storage.local.set({collecting: false})
+                            const updatedResponse = await chrome.storage.local.get(currentBatch)
+                            urls = updatedResponse[currentBatch]?.urls
+                            urlsDone = updatedResponse[currentBatch]?.urlsDone
+                            urlsMissing = urls.length - urlsDone.length
+
+                            if (urlsMissing == 0) {
+                                // hiding collect btn
+                                getTicketsBtn.setAttribute('style', 'display: none')
+                                document.getElementById('collectionStatus').innerText = 'Tickets collection up to date'
+                            } else if (urlsDone == 0) {
+                                // hiding tickets and clear btn
+                                [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+                            } else {
+                                document.getElementById('collectionStatus').innerText = `Missing ${urlsMissing} days`
+                            }
+                        }
+                    })
+                })
             }
 
             getTicketsBtn.addEventListener('click', () => {

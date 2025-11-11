@@ -8,7 +8,10 @@ function getAllDays() {
         chrome.storage.local.get(currentBatch).then(response=>{
           if (response[currentBatch]) {
             // urls
+            // response[currentBatch]?.todayUrl = document.querySelector('.day-navigation a.dropdown-item.active').href
             const urls = Array.from(document.querySelectorAll('.day-navigation a.dropdown-item')).map(el=>el.href)
+            const lastUrl = urls.pop()
+            if (lastUrl.includes('Demo-Day')) urls.push(lastUrl)
             if (!response[currentBatch]?.urls || response[currentBatch]?.urls?.length < urls.length) {
               response[currentBatch].urls = urls
               chrome.storage.local.set(response)

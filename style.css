@@ -21,6 +21,12 @@ body:not(#popup) > :last-child {
   gap: 1rem;
   background-color: lightgray;
   border-radius: 8px;
+  width: max-content;
+  padding: 0 1rem;
+}
+
+#popup .popup-header:has(h1:empty) {
+  display: none;
 }
 
 #popup .input-container, .collection-container {
