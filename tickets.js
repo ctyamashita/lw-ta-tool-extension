@@ -90,6 +90,11 @@ if (currentBatch) {
         </div>`
       )
 
+      tabContent.querySelectorAll('a[href]').forEach(el=>{
+        // fixing links
+        if (el.href.includes('chrome-extension://')) el.setAttribute('href', el.href.replace(location.origin, `https://kitt.lewagon.com/`))
+      })
+
       title.innerHTML = `<h3>${ticket.dayLecture} (${tabContent.childNodes.length})</h3>`
     })
 

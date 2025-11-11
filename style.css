@@ -11,7 +11,7 @@ html:has(#popup), #popup {
   height: fit-content;
 }
 
-body > :last-child {
+body:not(#popup) > :last-child {
   margin-bottom: 3rem;
 }
 
@@ -24,6 +24,32 @@ body > :last-child {
 
 #popup .input-container label {
   white-space: nowrap;
+}
+
+#popup #onDuty {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#popup #onDuty > .circle {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background-color: #d77070;
+}
+
+#popup #onDuty::after {
+  content: 'Off Duty';
+  display: inline-block;
+}
+
+#popup #onDuty.on::after {
+  content: 'On Duty';
+}
+
+#popup #onDuty.on > div {
+  background-color: darkkhaki;
 }
 
 #popup p {
@@ -45,11 +71,14 @@ body > :last-child {
 }
 
 #popup small {
+  margin-top: .5rem;
   display: block;
   text-align: center;
 }
 
-#popup button {
+#popup button,
+#popup a#statistics {
+  text-decoration: none;
   border: none;
   background-color: lightgrey;
   border-radius: 8px;

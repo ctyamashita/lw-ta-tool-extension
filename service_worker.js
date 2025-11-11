@@ -22,10 +22,9 @@ chrome.storage.sync.get(scripts).then((data) => {
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status != 'complete') return
-
+  
   const currentTab = await getCurrentTab();
   const { collecting, currentBatch } = await chrome.storage.local.get(['collecting', 'currentBatch']);
-
   if (validUrl(tab?.url)) scripts.forEach((script)=>triggerScript(tabId, script))
 
   if (tab?.url.includes('/day_dashboard')) {

@@ -9,7 +9,8 @@ function setCurrentBatch() {
   const initialData = {
     tickets: [],
     ticketCount: {},
-    urls: []
+    urls: [],
+    urlsDone: []
   }
 
   // check if already added to localStorage

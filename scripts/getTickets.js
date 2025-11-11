@@ -6,6 +6,8 @@ function extractText(array) {
 async function getTickets() {
   const { currentBatch } = await chrome.storage.local.get('currentBatch')
   const data = JSON.parse(localStorage.getItem(currentBatch.toString()))
+  data.urlsDone ||= []
+  data.urlsDone.push(location.href)
 
   const ticketsEl = document.querySelectorAll(".ticket-data")
   const dayLecture = document.querySelector("h2").innerText

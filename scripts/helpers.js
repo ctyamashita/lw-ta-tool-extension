@@ -19,3 +19,8 @@ export async function getLeWagonTab() {
   });
   return match[0]
 }
+
+export function timestamp() {
+  const date = new Date;
+  return date.toString().split(' ').slice(0,4).join(' ') 
+}
