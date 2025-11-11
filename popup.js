@@ -15,7 +15,7 @@ async function listenClick() {
 
     chrome.storage.local.get('currentBatch').then(async (currentBatchResponse) => {
         const { currentBatch } = currentBatchResponse
-        document.getElementById('lastCollectionTitle').innerText = `Tickets - Batch #${currentBatch}`
+        document.getElementById('currentBatch').innerText = `Batch #${currentBatch}`
         const { onDuty } = await chrome.storage.sync.get('onDuty')
         if (onDuty) {
             document.getElementById('onDuty').classList.add('on')
@@ -45,7 +45,7 @@ async function listenClick() {
                 urlsDone = updatedResponse[currentBatch]?.urlsDone || [];
                 urlsMissing = urls.length - urlsDone.length
             }
-            
+
             if (urlsMissing == 0) {
                 // hiding collect btn
                 getTicketsBtn.setAttribute('style', 'display: none')

@@ -45,9 +45,10 @@ function autoOnAfterBreak() {
             } else {
               // console.log('Remaining time:', remainingTime)
             }
-          } else if (mutation.type == 'attributes' && mutation.target.classList.contains('is-on-duty')) {
+          } else if (mutation.type == 'attributes' && mutation.target.classList.contains('switch-container')) {
             // if toggle change
-            chrome.storage.sync.set({ onDuty: true, onDutyLastTriggered: timestamp() })
+            const toggleValue = mutation.target.classList.contains('is-on-duty')
+            chrome.storage.sync.set({ onDuty: toggleValue, onDutyLastTriggered: timestamp() })
           }
         }
       });
