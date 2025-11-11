@@ -18,6 +18,7 @@ body:not(#popup) > :last-child {
 #popup .popup-header {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 1rem;
   background-color: lightgray;
   border-radius: 8px;
@@ -44,6 +45,7 @@ body:not(#popup) > :last-child {
   display: flex;
   align-items: center;
   gap: 4px;
+  height: fit-content;
 }
 
 #popup #onDuty > .circle {
@@ -55,6 +57,8 @@ body:not(#popup) > :last-child {
 
 #popup #onDuty::after {
   content: 'Off Duty';
+  font-weight: 700;
+  color: dimgray;
   display: inline-block;
 }
 
