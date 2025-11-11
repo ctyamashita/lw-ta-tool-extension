@@ -14,8 +14,8 @@ function autoOnAfterBreak() {
     if (autoOnAfterBreak) {
       // first time loading
       const currentDateString = timestamp()
-      const triggeredToday = onDutyLastTriggered === currentDateString
-      chrome.storage.sync.set({onDuty: triggeredToday})
+      const dayPassed = onDutyLastTriggered != currentDateString
+      if (dayPassed) chrome.storage.sync.set({onDuty: false})
       
       // setting observer
       const observer = new MutationObserver((mutationList, _observer) => {
