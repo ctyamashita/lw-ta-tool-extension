@@ -2,20 +2,16 @@ import { triggerScript, getCurrentTab, getLeWagonTab, timestamp } from './script
 
 chrome.runtime.connect({ name: "popup" })
 
-const getTicketsBtn = document.getElementById('getTickets');
-const clearTicketsBtn = document.getElementById('clearTickets');
-const ticketsIndexBtn = document.getElementById('ticketsIndex');
-
 function updateStatus(urlsMissing, urlsDone) {
     if (urlsMissing == 0) {
         // hiding collect btn
         getTicketsBtn.setAttribute('style', 'display: none')
-        document.getElementById('collectionStatus').innerText = 'Tickets collection up to date'
-    } else if (urlsDone == 0) {
+        document.getElementById('collectionStatus').innerText = `✅ Ticket collection up to date`
+    } else if (urlsDone.length <= 1) {
         // hiding tickets and clear btn
         [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
     } else {
-        document.getElementById('collectionStatus').innerText = `Missing ${urlsMissing} days`
+        document.getElementById('collectionStatus').innerText = `⚠️ ${urlsMissing} days missing`
     }
 }
 
@@ -38,18 +34,9 @@ async function listenClick() {
         chrome.storage.local.get(currentBatch).then(async (batchDataResponse) => {
             let urls = batchDataResponse[currentBatch]?.urls || [];
             let urlsDone = batchDataResponse[currentBatch]?.urlsDone || [];
-            let urlsMissing = urls.length - (urlsDone.length - 1)
+            let urlsMissing = urls.length - urlsDone.length
 
-            if (urlsMissing == 0) {
-                // hiding collect btn
-                getTicketsBtn.setAttribute('style', 'display: none')
-                document.getElementById('collectionStatus').innerText = `✅ Ticket collection up to date`
-            } else if (urlsDone.length <= 1) {
-                // hiding tickets and clear btn
-                [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
-            } else {
-                document.getElementById('collectionStatus').innerText = `⚠️ ${urlsMissing} days missing`
-            }
+            updateStatus(urlsMissing, urlsDone)
 
             const { lastTimeFetched } = await chrome.storage.local.get('lastTimeFetched')
             const currentTime = timestamp()
@@ -65,18 +52,9 @@ async function listenClick() {
                             const updatedResponse = await chrome.storage.local.get(currentBatch)
                             urls = updatedResponse[currentBatch]?.urls
                             urlsDone = updatedResponse[currentBatch]?.urlsDone
-                            urlsMissing = urls.length - (urlsDone.length - 1)
+                            urlsMissing = urls.length - urlsDone.length
 
-                            if (urlsMissing.length == 0) {
-                                // hiding collect btn
-                                getTicketsBtn.setAttribute('style', 'display: none')
-                                document.getElementById('collectionStatus').innerText = '✅ Ticket collection up to date'
-                            } else if (urlsDone.length <= 1) {
-                                // hiding tickets and clear btn
-                                [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
-                            } else {
-                                document.getElementById('collectionStatus').innerText = `⚠️ ${urlsMissing} days missing`
-                            }
+                            updateStatus(urlsMissing, urlsDone)
                         }
                     })
                 })
@@ -170,8 +148,10 @@ async function listenClick() {
             triggerScript(leWagonTab.id, 'autoOnAfterBreak')
         })
     })
-
-
 }
+
+const getTicketsBtn = document.getElementById('getTickets');
+const clearTicketsBtn = document.getElementById('clearTickets');
+const ticketsIndexBtn = document.getElementById('ticketsIndex');
 
 listenClick();

@@ -1,5 +1,10 @@
+:root {
+  --black: rgb(60,60,60);
+}
+
 *:not(i) {
   font-family: Nunito, 'Helvetica Neue', sans-serif !important;
+  color: var(--black);
 }
 
 /* popup */
@@ -24,6 +29,8 @@ body:not(#popup) > :last-child {
   border-radius: 8px;
   width: max-content;
   padding: 0 1rem;
+  text-decoration: none;
+  color: var(--black);
 }
 
 #popup .popup-header:has(h1:empty) {
@@ -102,7 +109,7 @@ body:not(#popup) > :last-child {
   border-radius: 8px;
   padding: .5rem 1rem;
   cursor:pointer;
-  color: rgb(60,60,60);
+  color: var(--black);
   font-weight: 600;
 }
 

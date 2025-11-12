@@ -5,6 +5,7 @@ function clearTickets() {
       batchData[currentBatch].tickets = []
       batchData[currentBatch].ticketCount = {}
       batchData[currentBatch].urlsDone = []
+      batchData[currentBatch].urls = []
       chrome.storage.local.set(batchData).then(()=>{
         localStorage.setItem(currentBatch, JSON.stringify(batchData[currentBatch]))
       })
