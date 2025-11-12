@@ -40,8 +40,7 @@ function descOrderEntriesByValue(obj) {
   return Object.entries(obj).sort((a,b)=>b[1] - a[1])
 }
 
-const currentBatchResponse = await chrome.storage.local.get('currentBatch')
-let currentBatch = currentBatchResponse.currentBatch
+let { currentBatch } = await chrome.storage.local.get('currentBatch')
 const ticketsContainer = document.getElementById('tickets-container')
 
 if (location.search.includes('batch=')) {
@@ -53,13 +52,15 @@ if (currentBatch) {
   const ticketsDataResponse = await chrome.storage.local.get(currentBatch)
   const ticketsData = ticketsDataResponse[currentBatch]
   const tickets = ticketsData?.tickets
+  const anyTickets = typeof tickets == 'array' && tickets?.length > 0
   const ticketCount = ticketsData?.ticketCount
 
   // update heading
+  document.title = `#${currentBatch} Tickets`
   document.querySelector('h1').innerText = `#${currentBatch} Tickets`
   document.querySelector('h2#all-tickets').innerText = `All Tickets (${tickets?.length || 0})`
 
-  if (tickets) {
+  if (anyTickets) {
     ticketsContainer.innerHTML = ''
     let totalDays = 0
     tickets.forEach(ticket=>{

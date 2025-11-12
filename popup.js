@@ -27,6 +27,7 @@ async function listenClick() {
         document.getElementById('currentBatch').innerText = `Batch #${currentBatch}`
         const { onDuty } = await chrome.storage.sync.get('onDuty')
         if (onDuty) document.getElementById('onDuty').classList.add('on')
+        document.querySelector('.popup-header').setAttribute('href', `https://kitt.lewagon.com/camps/${currentBatch}/tickets`)
 
         const progressEl = document.getElementById('progress');
         const progressBarEl = document.getElementById('progress-bar');
@@ -42,7 +43,7 @@ async function listenClick() {
             const currentTime = timestamp()
             const newDay = currentTime != lastTimeFetched
             if (urls.length == 0 || newDay) {
-                alert('Updating past ticket days')
+                // alert('Updating past ticket days')
                 chrome.storage.local.set({lastTimeFetched: currentTime, collecting: true}).then(async()=>{
                     const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: false })
                     chrome.tabs.onRemoved.addListener(async (tabId, _removeInfo) => {
