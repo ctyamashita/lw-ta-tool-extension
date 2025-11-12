@@ -9,8 +9,8 @@ function autoOnAfterBreak() {
   // check if it's on ticket page
   if (!/tickets\/?$/.test(url)) return;
 
-  chrome.storage.sync.get(["autoOnAfterBreak", "onDuty", "onDutyLastTriggered"]).then((result) => {
-    const { autoOnAfterBreak, onDuty, onDutyLastTriggered } = result
+  chrome.storage.sync.get(["autoOnAfterBreak", "onDutyLastTriggered"]).then((result) => {
+    const { autoOnAfterBreak, onDutyLastTriggered } = result
     if (autoOnAfterBreak) {
       // first time loading
       const currentDateString = timestamp()
@@ -18,9 +18,10 @@ function autoOnAfterBreak() {
       if (dayPassed) chrome.storage.sync.set({onDuty: false})
       
       // setting observer
-      const observer = new MutationObserver((mutationList, _observer) => {
+      const observer = new MutationObserver(async(mutationList, _observer) => {
         for (const mutation of mutationList) {
           // console.log("This element changed:", mutation.target)
+          const { onDuty } = await chrome.storage.sync.get('onDuty')
           // check if it's a remaining time update
           const isRemainingTimeEl = mutation.target?.parentElement?.parentElement?.classList?.contains('info-bubble')
           // target(span) > strong > div.info-bubble

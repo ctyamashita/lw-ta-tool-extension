@@ -1,10 +1,10 @@
 :root {
-  --black: rgb(60,60,60);
+  --black: rgb(90,60,60);
+  --checkbox-height: 20px;
 }
 
 *:not(i) {
   font-family: Nunito, 'Helvetica Neue', sans-serif !important;
-  color: var(--black);
 }
 
 /* popup */
@@ -18,6 +18,95 @@ html:has(#popup), #popup {
 
 body:not(#popup) > :last-child {
   margin-bottom: 3rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+label {
+  color: var(--black) !important;
+}
+
+label {
+  font-weight: 700;
+  padding: 8px;
+  border-radius: 200px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.3);
+}
+
+label:has(:checked) {
+  background-color: darkkhaki;
+  box-shadow: none;
+}
+
+/* Customize the label (the container) */
+.input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: calc(var(--checkbox-height) * 1.5);
+  height: var(--checkbox-height);
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.input-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--checkbox-height);
+  width: var(--checkbox-height);
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.input-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.input-container input:checked ~ .checkmark {
+  background-color: white;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.input-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.input-container .checkmark:after {
+  left: 50%;
+  top: 50%;
+  width: 20%;
+  height: 40%;
+  border: solid darkcyan;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg) translate(-100%, -20%);
 }
 
 #popup .popup-header {
@@ -37,16 +126,36 @@ body:not(#popup) > :last-child {
   display: none;
 }
 
-#popup .input-container, .collection-container {
+#popup #optionsForm {
+  display: grid;
+  gap: 8px;
+}
+
+/* #popup #optionsForm input[type="checkbox"],
+#popup #optionsForm .input-container:hover input[type="checkbox"] {
+  accent-color: darkkhaki;
+} */
+
+
+/* #popup .input-container,  */
+#popup .collection-container {
   display: flex;
   align-items: center;
   padding: .2em .4em;
   gap: .4em;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.3);
+  border-radius: 40px;
 }
 
-#popup .input-container label {
+/* #popup .input-container {
   white-space: nowrap;
+  cursor: pointer;
 }
+
+#popup .input-container:has(input:checked) {
+  background-color: darkkhaki;
+  box-shadow: none;
+} */
 
 #popup #onDuty {
   display: flex;
