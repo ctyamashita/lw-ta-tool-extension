@@ -8,6 +8,12 @@ chrome.storage.sync.get('css').then(response=>{
   })
 })
 
+function pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+}
+
 function stringTimeToIntegerSeconds(string) {
   string = string.trim()
   let totalSec = 0
@@ -65,6 +71,7 @@ if (currentBatch) {
   if (anyTickets) {
     ticketsContainer.innerHTML = ''
     let totalDays = 0
+    let dayNum = 0
     tickets.forEach(ticket=>{
       const id = ticket.dayLecture.replaceAll(/[ ,&()]+/g, '-').toLowerCase()
       let tab = document.getElementById(id)
@@ -80,6 +87,7 @@ if (currentBatch) {
         tab.appendChild(tabContent)
         ticketsContainer.appendChild(tab)
         totalDays++
+        dayNum++
       }
 
       tabContent.insertAdjacentHTML('beforeend',
@@ -98,7 +106,7 @@ if (currentBatch) {
         if (el.href.includes('chrome-extension://')) el.setAttribute('href', el.href.replace(location.origin, `https://kitt.lewagon.com/`))
       })
 
-      title.innerHTML = `<h3>${ticket.dayLecture} (${tabContent.childNodes.length})</h3>`
+      title.innerHTML = `<h3>Day ${pad(dayNum, 2)} | ${ticket.dayLecture} (${tabContent.childNodes.length})</h3>`
     })
 
     // most Tickets

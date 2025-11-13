@@ -2,15 +2,18 @@ import { triggerScript, getCurrentTab, getLeWagonTab, timestamp } from './script
 
 chrome.runtime.connect({ name: "popup" })
 
-function updateStatus(urlsMissing, urlsDone, tickets) {
-    if (urlsMissing == 0) {
+function updateStatus(urls, urlsMissing, urlsDone, tickets) {
+    if (urls.length == 0) {
+        [ticketsIndexBtn, clearTicketsBtn,getTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+    } else if (urlsMissing == 0) {
         // hiding collect btn
         getTicketsBtn.setAttribute('style', 'display: none')
         document.getElementById('collectionStatus').innerText = `✅ Ticket collection up to date`
 
-    } else if (urlsDone.length == 0 || tickets.length == 0) {
+    } else if (urlsDone?.length == 0 || tickets?.length == 0) {
         // hiding tickets and clear btn
         [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+        getTicketsBtn.removeAttribute('style')
         document.getElementById('collectionStatus').innerText = ''
     } else {
         document.getElementById('collectionStatus').innerText = `⚠️ ${urlsMissing} days missing`
@@ -40,7 +43,7 @@ async function listenClick() {
             let urlsDone = batchDataResponse[currentBatch]?.urlsDone || [];
             let urlsMissing = urls.length - urlsDone.length
 
-            updateStatus(urlsMissing, urlsDone, tickets)
+            updateStatus(urls, urlsMissing, urlsDone, tickets)
 
             const { lastTimeFetched } = await chrome.storage.local.get('lastTimeFetched')
             const currentTime = timestamp()
@@ -58,7 +61,7 @@ async function listenClick() {
                             urlsDone = updatedResponse[currentBatch]?.urlsDone
                             urlsMissing = urls.length - urlsDone.length
 
-                            updateStatus(urlsMissing, urlsDone, tickets)
+                            updateStatus(urls, urlsMissing, urlsDone, tickets)
                         }
                     })
                 })

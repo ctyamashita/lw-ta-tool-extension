@@ -23,7 +23,6 @@ body:not(#popup) > :last-child {
 h1,
 h2,
 h3,
-h4,
 label {
   color: var(--black) !important;
 }
@@ -285,9 +284,6 @@ h2 {
   border-bottom: solid lightgray;
 }
 
-summary:has(h2,h3) {
-  border-bottom: solid lightgray;
-}
 summary h2 {
   border-bottom: none;
 }
@@ -298,10 +294,6 @@ li {
 
 details details {
   margin: 0 1rem;
-}
-
-details details[open] summary {
-  margin: 1rem 0;
 }
 
 .popover {
@@ -352,8 +344,18 @@ details details[open] summary {
 }
 
 #tickets-dashboard details summary {
-  color: black;
+  color: var(--black);
+  border-radius: 1rem 1rem 0 0;
   padding: 1rem;
+}
+
+#tickets-dashboard details details[open] summary {
+  background-color: var(--black);
+  color: white;
+}
+
+#tickets-dashboard details details[open] summary h3 {
+  color: white !important;
 }
 
 #tickets-dashboard details details[open] {
