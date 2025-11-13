@@ -112,6 +112,7 @@ async function listenClick() {
             if (confirm("Are you sure?") == true) {
                 triggerScript(leWagonTab.id, 'clearTickets')
                 alert(`Cleared all tickets from #${currentBatch}`)
+                window.close()
             }
         })
     })
