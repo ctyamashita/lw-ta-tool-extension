@@ -11,6 +11,8 @@ function hideWott() {
     const wottEl = Array.from(elWithIds).find(el=>el.id.includes('ticket_conversations'))
     let wottContainer = document.querySelector('.wottContainer')
     
+    if (wottEl == undefined) return
+
     if (wottContainer == null) {
       // if missing container
       wottContainer ||= document.createElement('div')

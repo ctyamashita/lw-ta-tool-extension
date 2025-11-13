@@ -28,12 +28,12 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://kitt.lewagon.com/camps/*/tickets"],
-            "js": ["scripts/autoOnAfterBreak.js", "scripts/hideWott.js"]
+            "matches": ["https://kitt.lewagon.com/"],
+            "js": ["scripts/copyCSS.js"]
         },
         {
-            "matches": ["https://kitt.lewagon.com/camps/*/tickets/day_dashboard"],
-            "js": ["scripts/getAllDays.js", "scripts/getTickets.js"]
+            "matches": ["https://kitt.lewagon.com/camps/*/tickets"],
+            "js": ["scripts/autoOnAfterBreak.js", "scripts/hideWott.js"]
         }
     ]
 }

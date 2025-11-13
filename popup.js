@@ -2,14 +2,16 @@ import { triggerScript, getCurrentTab, getLeWagonTab, timestamp } from './script
 
 chrome.runtime.connect({ name: "popup" })
 
-function updateStatus(urlsMissing, urlsDone) {
+function updateStatus(urlsMissing, urlsDone, tickets) {
     if (urlsMissing == 0) {
         // hiding collect btn
         getTicketsBtn.setAttribute('style', 'display: none')
         document.getElementById('collectionStatus').innerText = `✅ Ticket collection up to date`
-    } else if (urlsDone.length <= 1) {
+
+    } else if (urlsDone.length == 0 || tickets.length == 0) {
         // hiding tickets and clear btn
         [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+        document.getElementById('collectionStatus').innerText = ''
     } else {
         document.getElementById('collectionStatus').innerText = `⚠️ ${urlsMissing} days missing`
     }
@@ -33,11 +35,12 @@ async function listenClick() {
         const progressBarEl = document.getElementById('progress-bar');
         const collectionStatus = document.getElementById('collectionStatus')
         chrome.storage.local.get(currentBatch).then(async (batchDataResponse) => {
+            const { tickets } = batchDataResponse[currentBatch]
             let urls = batchDataResponse[currentBatch]?.urls || [];
             let urlsDone = batchDataResponse[currentBatch]?.urlsDone || [];
             let urlsMissing = urls.length - urlsDone.length
 
-            updateStatus(urlsMissing, urlsDone)
+            updateStatus(urlsMissing, urlsDone, tickets)
 
             const { lastTimeFetched } = await chrome.storage.local.get('lastTimeFetched')
             const currentTime = timestamp()
@@ -55,7 +58,7 @@ async function listenClick() {
                             urlsDone = updatedResponse[currentBatch]?.urlsDone
                             urlsMissing = urls.length - urlsDone.length
 
-                            updateStatus(urlsMissing, urlsDone)
+                            updateStatus(urlsMissing, urlsDone, tickets)
                         }
                     })
                 })
