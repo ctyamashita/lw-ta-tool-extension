@@ -46,7 +46,7 @@ function autoOnAfterBreak() {
                   toggle.click();
                   location.reload();
                 } else {
-                  // console.log('Remaining time:', remainingTime)
+                  console.log('Remaining time:', remainingTime)
                 }
               }
             })

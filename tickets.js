@@ -42,6 +42,7 @@ function descOrderEntriesByValue(obj) {
 
 let { currentBatch } = await chrome.storage.local.get('currentBatch')
 const ticketsContainer = document.getElementById('tickets-container')
+console.log(currentBatch)
 
 if (location.search.includes('batch=')) {
   const batch = location.search.match(/\^?batch=(\d+)/)[1];
@@ -52,7 +53,8 @@ if (currentBatch) {
   const ticketsDataResponse = await chrome.storage.local.get(currentBatch)
   const ticketsData = ticketsDataResponse[currentBatch]
   const tickets = ticketsData?.tickets
-  const anyTickets = typeof tickets == 'array' && tickets?.length > 0
+  console.log(tickets)
+  const anyTickets = typeof tickets == 'object' && tickets?.length > 0
   const ticketCount = ticketsData?.ticketCount
 
   // update heading

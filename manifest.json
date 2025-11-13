@@ -25,5 +25,15 @@
     "action": {
         "default_title": "TA extension",
         "default_popup": "popup.html"
-    } 
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://kitt.lewagon.com/camps/*/tickets"],
+            "js": ["scripts/autoOnAfterBreak.js", "scripts/hideWott.js"]
+        },
+        {
+            "matches": ["https://kitt.lewagon.com/camps/*/tickets/day_dashboard"],
+            "js": ["scripts/getAllDays.js", "scripts/getTickets.js"]
+        }
+    ]
 }

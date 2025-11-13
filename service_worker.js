@@ -1,6 +1,6 @@
 import {triggerScript, getCurrentTab} from './scripts/helpers.js'
 
-const scripts = ['hideWott', 'autoOnAfterBreak', 'setCurrentBatch', 'copyCSS']
+const scripts = ['setCurrentBatch', 'copyCSS']
 
 function validUrl(url) {
   if (!url || typeof url !== 'string') return false
