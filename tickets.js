@@ -56,14 +56,14 @@ async function loadData(currentBatch) {
   // update heading
   document.title = `#${currentBatch} Tickets`
   document.querySelector('h1').innerText = `#${currentBatch} Tickets`
-  document.querySelector('h2#all-tickets').innerText = `All Tickets (${tickets?.length || 0})`
+  document.querySelector('h2#all-tickets').innerText = `🎟️ All Tickets (${tickets?.length || 0})`
 
   if (!anyTickets) return
 
   ticketsContainer.innerHTML = ''
   let totalDays = 0
   let dayNum = 0
-  tickets.forEach(ticket=>{
+  tickets.forEach((ticket,index)=>{
     const id = ticket.dayLecture.replaceAll(/[ ,&()]+/g, '-').toLowerCase()
     let tab = document.getElementById(id)
     let tabContent = document.querySelector(`#${id} > div`)
@@ -82,14 +82,15 @@ async function loadData(currentBatch) {
     }
 
     tabContent.insertAdjacentHTML('beforeend',
-      `<div class="popover">
+      `<label class="popover" data-id="${index + 1}">
+        <input type="checkbox" class="bookmarked" >
         <div class="popover-header">
           ${ticket.title}
         </div>
         <div class="popover-body">
           ${ticket.content.replace('fas fa-heart', 'fa-solid fa-heart')}
         </div>
-      </div>`
+      </label>`
     )
 
     tabContent.querySelectorAll('a[href]').forEach(el=>{
@@ -111,7 +112,7 @@ async function loadData(currentBatch) {
   })
 
   // finding longest ticket
-  const allTickets = document.querySelectorAll('.popover');
+  const allTickets = document.querySelectorAll('#tickets-container .popover');
 
   const sortedTickets = Array.from(allTickets).sort((a,b)=>{
     const aTime = a.querySelector('.ticket-popover-time').innerHTML
@@ -120,12 +121,36 @@ async function loadData(currentBatch) {
     return stringTimeToIntegerSeconds(bTime) - stringTimeToIntegerSeconds(aTime)}
   )
   const longestTicket = sortedTickets[0]
-  document.querySelector("#longest").appendChild(longestTicket)
+  document.getElementById("longest").appendChild(longestTicket.cloneNode(true))
 
   const picky = {}
   const favorites = {}
   const createdByTA = {}
+  const bookmarked = []
+  const bookmarkedContainer = document.getElementById('bookmarked-container')
+
   allTickets.forEach(ticket=>{
+    ticket.addEventListener('input', (e)=>{
+      const ticketCard = e.currentTarget
+      const isBookmarked = !!ticketCard.querySelector('input:checked')
+
+      const id = Number(ticketCard.dataset.id)
+      if (isBookmarked) {
+        bookmarked.push(id)
+        const ticketCopy = ticketCard.cloneNode(true)
+        ticketCopy.querySelector('input').remove()
+        ticketCopy.removeAttribute('data-id')
+        ticketCopy.id = id
+        bookmarkedContainer.appendChild(ticketCopy)
+      } else {
+        const index = bookmarked.indexOf(id);
+        if (index > -1) { // only splice array when item is found
+          bookmarked.splice(index, 1); // 2nd parameter means remove one item only
+          document.getElementById(id).remove()
+        }
+      }
+    })
+
     const isPreferredTeacherPresent = ticket.querySelector('.pref-teacher')
     if (isPreferredTeacherPresent) {
       const ticketText = ticket.querySelector('.ticket-popover-body')
