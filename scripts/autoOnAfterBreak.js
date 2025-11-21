@@ -44,7 +44,17 @@ function autoOnAfterBreak() {
                 if (remainingTime == 0) {
                   const toggle = document.querySelector('a:has(.switch)')
                   toggle.click();
-                  location.reload();
+                  setTimeout(() => {
+                    const popup = document.querySelector('.modal-dialog:has(#ticket-skills)')
+                    if (popup != null) {
+                      const skillsBtns = popup.querySelectorAll('#ticket-skills a')
+                      const submitBtn = popup.querySelector('.modal-footer button')
+
+                      skillsBtns.forEach(btn=>btn.click())
+                      submitBtn.click()
+                    }
+                    location.reload();
+                  }, 1000);
                 } else {
                   // console.log('Remaining time:', remainingTime)
                 }

@@ -3,7 +3,8 @@ function setCurrentBatch() {
   if (invalidUrl) return
   const batch = document.querySelector('.menu-trigger-content-label')
   if (!batch) return
-  const batchNumber = batch.innerText.match(/#(\d+)/)[1]
+  const batchNumberMatch = batch.innerText.match(/#(\d+)/) || []
+  const batchNumber = batchNumberMatch[1]
   // console.log('Current batch set to:', batchNumber)
 
   const initialData = {
