@@ -46,7 +46,7 @@ function descOrderEntriesByValue(obj) {
   return Object.entries(obj).sort((a,b)=>b[1] - a[1])
 }
 
-function addToBookmark(ticket) {
+function addToBookmark(ticket, ticketsDataResponse, currentBatch) {
   const bookmarkedContainer = document.getElementById('bookmarked-container')
   const id = Number(ticket.dataset.id)
   const ticketCopy = ticket.cloneNode(true)
@@ -56,6 +56,9 @@ function addToBookmark(ticket) {
   ticketCopy.addEventListener('click', (e) => {
     ticket.querySelector('input').checked = false
     e.currentTarget.remove()
+    const bookmarked = Array.from(bookmarkedContainer.children).map(el=>Number(el.id))
+    ticketsDataResponse[currentBatch].bookmarked = bookmarked
+    chrome.storage.local.set(ticketsDataResponse)
   })
   bookmarkedContainer.appendChild(ticketCopy)
 }
@@ -141,13 +144,12 @@ async function loadData(currentBatch) {
   const picky = {}
   const favorites = {}
   const createdByTA = {}
-  const bookmarkedContainer = document.getElementById('bookmarked-container')
 
   allTickets.forEach(ticket=>{
     const id = ticket.dataset.id
     if (bookmarked.includes(Number(id))) {
       ticket.querySelector('input').checked = true
-      addToBookmark(ticket)
+      addToBookmark(ticket, ticketsDataResponse, currentBatch)
     }
 
     ticket.addEventListener('input', (e)=>{
@@ -157,7 +159,7 @@ async function loadData(currentBatch) {
       const id = Number(ticketCard.dataset.id)
       if (isBookmarked) {
         bookmarked.push(id)
-        addToBookmark(ticketCard)
+        addToBookmark(ticketCard, ticketsDataResponse, currentBatch)
       } else {
         const index = bookmarked.indexOf(id);
         if (index > -1) { // only splice array when item is found
