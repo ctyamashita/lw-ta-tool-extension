@@ -46,11 +46,26 @@ function descOrderEntriesByValue(obj) {
   return Object.entries(obj).sort((a,b)=>b[1] - a[1])
 }
 
+function addToBookmark(ticket) {
+  const bookmarkedContainer = document.getElementById('bookmarked-container')
+  const id = Number(ticket.dataset.id)
+  const ticketCopy = ticket.cloneNode(true)
+  ticketCopy.querySelector('input').remove()
+  ticketCopy.removeAttribute('data-id')
+  ticketCopy.id = id
+  ticketCopy.addEventListener('click', (e) => {
+    ticket.querySelector('input').checked = false
+    e.currentTarget.remove()
+  })
+  bookmarkedContainer.appendChild(ticketCopy)
+}
+
 async function loadData(currentBatch) {
   if (!currentBatch) return
 
   const ticketsDataResponse = await chrome.storage.local.get(currentBatch)
   const { tickets, ticketCount } = ticketsDataResponse[currentBatch]
+  const bookmarked = ticketsDataResponse[currentBatch].bookmarked || []
   const anyTickets = typeof tickets == 'object' && tickets?.length > 0
 
   // update heading
@@ -126,10 +141,15 @@ async function loadData(currentBatch) {
   const picky = {}
   const favorites = {}
   const createdByTA = {}
-  const bookmarked = []
   const bookmarkedContainer = document.getElementById('bookmarked-container')
 
   allTickets.forEach(ticket=>{
+    const id = ticket.dataset.id
+    if (bookmarked.includes(Number(id))) {
+      ticket.querySelector('input').checked = true
+      addToBookmark(ticket)
+    }
+
     ticket.addEventListener('input', (e)=>{
       const ticketCard = e.currentTarget
       const isBookmarked = !!ticketCard.querySelector('input:checked')
@@ -137,11 +157,7 @@ async function loadData(currentBatch) {
       const id = Number(ticketCard.dataset.id)
       if (isBookmarked) {
         bookmarked.push(id)
-        const ticketCopy = ticketCard.cloneNode(true)
-        ticketCopy.querySelector('input').remove()
-        ticketCopy.removeAttribute('data-id')
-        ticketCopy.id = id
-        bookmarkedContainer.appendChild(ticketCopy)
+        addToBookmark(ticketCard)
       } else {
         const index = bookmarked.indexOf(id);
         if (index > -1) { // only splice array when item is found
@@ -149,6 +165,8 @@ async function loadData(currentBatch) {
           document.getElementById(id).remove()
         }
       }
+      ticketsDataResponse[currentBatch].bookmarked = bookmarked
+      chrome.storage.local.set(ticketsDataResponse)
     })
 
     const isPreferredTeacherPresent = ticket.querySelector('.pref-teacher')

@@ -11,7 +11,8 @@ function setCurrentBatch() {
     tickets: [],
     ticketCount: {},
     urls: [],
-    urlsDone: []
+    urlsDone: [],
+    bookmarked: []
   }
 
   // check if already added to localStorage
