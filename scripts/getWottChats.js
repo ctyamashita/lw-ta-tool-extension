@@ -6,6 +6,7 @@ async function getWottChats() {
       const student = row.querySelector('.student-name').innerText
       const wottCount = Number(row.querySelector('.num-column:last-child').innerText)
       const flashcard = Number(row.querySelector('.num-column:nth-last-child(2)').innerText.slice(0,-1))
+      response[currentBatch].students[student] ||= {ticketCount: 0, wottCount: 0, flashcard: 0}
       response[currentBatch].students[student].wottCount = wottCount
       response[currentBatch].students[student].flashcard = flashcard
     })
@@ -15,11 +16,11 @@ async function getWottChats() {
 
     chrome.storage.local.get('collecting').then(response=>{
       const { collecting } = response
-      if (collecting) {
-        window.close()
-      }
+      if (collecting) window.close()
     })
   })
 }
 
-getWottChats()
+setTimeout(() => {
+  getWottChats()
+}, 1000);

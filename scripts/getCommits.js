@@ -24,22 +24,21 @@ async function getCommits() {
     })
   })
 
-  const teams = Array.from(document.querySelectorAll('h4')).map(el=>el.innerText)
+  const teams = Array.from(document.querySelectorAll('h4')).map(el=>el.innerText.trim())
   const teamCommits = Array.from(document.querySelectorAll('.flex-shrink-0 small')).map(el=>Number(el.innerText.slice(0,-8)))
   data.teams ||= {}
   teams.forEach((team,index)=>{
-    data.teams[team] = teamCommits[index]
+    data.teams[team] ||= {}
+    data.teams[team].commitCount = teamCommits[index]
   })
 
   localStorage.setItem(currentBatch, JSON.stringify(data))
   await chrome.storage.local.set({[currentBatch]: data})
   chrome.storage.local.get('collecting').then(response=>{
     const { collecting } = response
-    if (collecting) {
-      chrome.storage.local.set({collecting: false})
-      window.close()
-    }
+    if (collecting) window.close()
   })
 }
-
-getCommits()
+setTimeout(() => {
+  getCommits()
+}, 1000);

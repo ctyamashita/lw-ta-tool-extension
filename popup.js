@@ -51,31 +51,27 @@ async function listenClick() {
             if (urls.length == 0 || newDay) {
                 // alert('Updating past ticket days')
                 chrome.storage.local.set({lastTimeFetched: currentTime, collecting: true}).then(async()=>{
+                    chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/dashboard`, active: false })
                     const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: false })
                     chrome.tabs.onRemoved.addListener(async (tabId, _removeInfo) => {
                         if (statisticsTab.id == tabId) {
                             // remove tab after completion
-                            chrome.storage.local.set({collecting: false})
                             const updatedResponse = await chrome.storage.local.get(currentBatch)
                             urls = updatedResponse[currentBatch]?.urls
                             urlsDone = updatedResponse[currentBatch]?.urlsDone
                             urlsMissing = urls.length - urlsDone.length
+                            if (/Projects/.test(urls.slice(-1)[0])) await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/project_dashboard`, active: false })
+                            
+                            setTimeout(() => {
+                                chrome.storage.local.set({collecting: false})
+                            }, 5000);
 
                             updateStatus(urls, urlsMissing, urlsDone, tickets)
                         }
                     })
                 })
             }
-            
-            chrome.storage.local.set({collecting: true}).then(()=>{
-                chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/dashboard`, active: false })
-            })
 
-            if (/Projects/.test(urls.slice(-1)[0])) {
-                chrome.storage.local.set({collecting: true}).then(()=>{
-                    chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/project_dashboard`, active: false })
-                })
-            }
 
             getTicketsBtn.addEventListener('click', () => {
                 if (urls.length == 0) {

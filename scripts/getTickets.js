@@ -9,6 +9,16 @@ async function getTickets() {
   data.urlsDone ||= []
   if (!data.urlsDone.includes(location.href) && location.href !== `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`) data.urlsDone.push(location.href)
 
+  if (location.href.includes('-Projects')) {
+    const teamsEl = document.querySelectorAll('.student-ticket-data')
+    teamsEl.forEach(el=>{
+      const teamName = el.querySelector('a').innerText
+      const ticketCount = Number(el.querySelector('.left-offset').innerText.replace(/[^0-9]/g, ''))
+      data.teams[teamName] ||= {ticketCount: 0}
+      data.teams[teamName].ticketCount += ticketCount
+    })
+  }
+
   const ticketsEl = document.querySelectorAll(".ticket-data")
   const dayLecture = document.querySelector("h2").innerText
   ticketsEl.forEach(ticket => {

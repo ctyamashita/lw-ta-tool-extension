@@ -254,11 +254,19 @@ async function loadData(currentBatch) {
   })
 
   // teams commit
-  const arrTeams = Object.entries(teams)
+  const arrTeams = Object.entries(teams).map(arr=> [arr[0], arr[1].commitCount])
   const sortedTeams = descOrderEntriesByValue(arrTeams)
   sortedTeams.forEach(team=>{
     const [ name, amount ] = team
     document.querySelector("#teams").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} commits</li>`)
+  })
+
+  // teams tickets
+  const arrTeamsTicket = Object.entries(teams).map(arr=> [arr[0], arr[1].ticketCount])
+  const sortedTeamsTicket = descOrderEntriesByValue(arrTeamsTicket)
+  sortedTeamsTicket.forEach(team=>{
+    const [ name, amount ] = team
+    document.querySelector("#teams-ticket").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} tickets</li>`)
   })
 }
 
