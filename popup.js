@@ -66,6 +66,16 @@ async function listenClick() {
                     })
                 })
             }
+            
+            chrome.storage.local.set({collecting: true}).then(()=>{
+                chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/dashboard`, active: false })
+            })
+
+            if (/Projects/.test(urls.slice(-1)[0])) {
+                chrome.storage.local.set({collecting: true}).then(()=>{
+                    chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/project_dashboard`, active: false })
+                })
+            }
 
             getTicketsBtn.addEventListener('click', () => {
                 if (urls.length == 0) {

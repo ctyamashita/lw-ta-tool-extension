@@ -278,7 +278,7 @@ label:not(.popover):has(:checked) {
   border-bottom: solid;
 }
 
-h2 {
+h2, h3 {
   margin-bottom: 1rem !important;
   padding-bottom: 8px;
   border-bottom: solid lightgray;
@@ -328,6 +328,10 @@ details details {
   gap: 3rem;
   margin: 3rem 0;
   flex-wrap: wrap;
+}
+
+.flex-container > div {
+  flex-grow: 1;
 }
 
 #longest {

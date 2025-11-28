@@ -37,6 +37,16 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         })
       }
     })
+  } else if (tab?.url.includes('/project_dashboard')) {
+    chrome.scripting.executeScript({
+      target: {tabId: tabId, allFrames: true},
+      files: [`scripts/getCommits.js`]
+    })
+  } else if (tab?.url.includes('/dashboard')) {
+    chrome.scripting.executeScript({
+      target: {tabId: tabId, allFrames: true},
+      files: [`scripts/getWottChats.js`]
+    })
   }
 })
 

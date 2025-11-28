@@ -9,7 +9,7 @@ function setCurrentBatch() {
 
   const initialData = {
     tickets: [],
-    ticketCount: {},
+    students: {},
     urls: [],
     urlsDone: [],
     bookmarked: []

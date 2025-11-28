@@ -20,10 +20,10 @@ async function getTickets() {
 
     if (!alreadyAdded && student && title && content) {
       if (student) {
-        if (data.ticketCount[student] == undefined) {
-          data.ticketCount[student] = { ticketCount: 1 }
+        if (data.students[student] == undefined) {
+          data.students[student] = { ticketCount: 1, commitCount: 0, branchCount: 0, wottCount: 0, flashcard: 0 }
         } else {
-          data.ticketCount[student].ticketCount++
+          data.students[student].ticketCount++
         }
 
         data.tickets.push({

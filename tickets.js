@@ -42,8 +42,8 @@ function stringTimeToIntegerSeconds(string) {
   return totalSec
 }
 
-function descOrderEntriesByValue(obj) {
-  return Object.entries(obj).sort((a,b)=>b[1] - a[1])
+function descOrderEntriesByValue(arr) {
+  return arr.sort((a,b)=>b[1] - a[1])
 }
 
 function addToBookmark(ticket, ticketsDataResponse, currentBatch) {
@@ -66,14 +66,15 @@ function addToBookmark(ticket, ticketsDataResponse, currentBatch) {
 async function loadData(currentBatch) {
   if (!currentBatch) return
 
+  const listLimit = 5
   const ticketsDataResponse = await chrome.storage.local.get(currentBatch)
-  const { tickets, ticketCount } = ticketsDataResponse[currentBatch]
+  const { tickets, students, teams } = ticketsDataResponse[currentBatch]
   const bookmarked = ticketsDataResponse[currentBatch].bookmarked || []
   const anyTickets = typeof tickets == 'object' && tickets?.length > 0
 
   // update heading
-  document.title = `#${currentBatch} Tickets`
-  document.querySelector('h1').innerText = `#${currentBatch} Tickets`
+  document.title = `Batch #${currentBatch}`
+  document.querySelector('h1').innerText = `Batch #${currentBatch}`
   document.querySelector('h2#all-tickets').innerText = `🎟️ All Tickets (${tickets?.length || 0})`
 
   if (!anyTickets) return
@@ -117,16 +118,6 @@ async function loadData(currentBatch) {
     })
 
     title.innerHTML = `<h3>Day ${pad(dayNum, 2)} | ${ticket.dayLecture} (${tabContent.childNodes.length})</h3>`
-  })
-
-  // most Tickets
-  const arrCount = Object.entries(ticketCount).map(entry=>[entry[0], entry[1].ticketCount])
-  const sortedCount = arrCount.sort((a,b)=> b[1] - a[1] )
-
-  sortedCount.slice(0,8).forEach(student=>{
-    const [ name, amount ] = student
-    const ticketsPerDay = Math.round(amount / totalDays * 10) / 10
-    document.querySelector("#most").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} tickets (${ticketsPerDay}/day)</li>`)
   })
 
   // finding longest ticket
@@ -191,24 +182,83 @@ async function loadData(currentBatch) {
   })
 
   // Tickets by TA
-  const sortedCreatedByTA = descOrderEntriesByValue(createdByTA)
+  const sortedCreatedByTA = descOrderEntriesByValue(Object.entries(createdByTA))
   sortedCreatedByTA.forEach(teacher=>{
     const [teacherImg, count] = teacher
     document.querySelector('#created').insertAdjacentHTML('beforeend', `<span><img class="favorite-ta" src="${teacherImg}" /><strong>${count}<strong> <small>tickets</small></span>`)
   })
 
   // favorite
-  const sortedFavorites = descOrderEntriesByValue(favorites)
+  const sortedFavorites = descOrderEntriesByValue(Object.entries(favorites))
   sortedFavorites.forEach(favorite=>{
     const [favoriteImg,favoriteCount] = favorite
     document.querySelector('#favorite').insertAdjacentHTML('beforeend', `<span><img class="favorite-ta" src="${favoriteImg}" /><strong>${favoriteCount}<strong> <small>tickets</small></span>`)
   })
 
   // picky
-  const sortedPicky = descOrderEntriesByValue(picky)
-  sortedPicky.slice(0,8).forEach(picky=>{
+  const sortedPicky = descOrderEntriesByValue(Object.entries(picky))
+  sortedPicky.slice(0,listLimit).forEach(picky=>{
     const [pickyName,pickyCount] = picky
     document.querySelector('#picky').insertAdjacentHTML('beforeend', `<li><strong>${pickyName}</strong> - ${pickyCount} tickets</li>`)
+  })
+
+  const arrCount = []
+  const arrCommits = []
+  const arrBranches = []
+  const arrFlashcard = []
+  const arrWott = []
+
+  for (const student in students) {  
+    const { ticketCount, commitCount, branchCount, wottCount, flashcard } = students[student];
+    
+    arrCount.push([student, ticketCount])
+    arrCommits.push([student, commitCount])
+    arrBranches.push([student, branchCount])
+    arrFlashcard.push([student, flashcard])
+    arrWott.push([student, wottCount])
+  }
+  
+  // most Tickets
+  const sortedCount = descOrderEntriesByValue(arrCount)
+  sortedCount.slice(0,listLimit).forEach(student=>{
+    const [ name, amount ] = student
+    const ticketsPerDay = Math.round(amount / totalDays * 10) / 10
+    document.querySelector("#most").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} tickets (${ticketsPerDay}/day)</li>`)
+  })
+
+  // commits
+  const sortedCommits = descOrderEntriesByValue(arrCommits)
+  sortedCommits.slice(0,listLimit).forEach(student=>{
+    const [ name, amount ] = student
+    document.querySelector("#commits").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} commits</li>`)
+  })
+  // branches
+  const sortedBranches = descOrderEntriesByValue(arrBranches)
+  sortedBranches.slice(0,listLimit).forEach(student=>{
+    const [ name, amount ] = student
+    document.querySelector("#branches").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} branches</li>`)
+  })
+
+  // wott chats
+  const sortedWott = descOrderEntriesByValue(arrWott)
+  sortedWott.slice(0,listLimit).forEach(student=>{
+    const [ name, amount ] = student
+    document.querySelector("#wott").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} chats</li>`)
+  })
+
+  // flashcard completion
+  const sortedFlashcard = descOrderEntriesByValue(arrFlashcard)
+  sortedFlashcard.slice(0,listLimit).forEach(student=>{
+    const [ name, amount ] = student
+    document.querySelector("#flashcard").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount}%</li>`)
+  })
+
+  // teams commit
+  const arrTeams = Object.entries(teams)
+  const sortedTeams = descOrderEntriesByValue(arrTeams)
+  sortedTeams.forEach(team=>{
+    const [ name, amount ] = team
+    document.querySelector("#teams").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} commits</li>`)
   })
 }
 
