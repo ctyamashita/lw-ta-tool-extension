@@ -46,6 +46,21 @@ function descOrderEntriesByValue(arr) {
   return arr.sort((a,b)=>b[1] - a[1])
 }
 
+function buildRow(name, amount, unit) {
+  return `<tr>
+      <td><strong>${name}</strong></td>
+      <td>${amount} <small>${unit}</small></td>
+    </tr>`
+}
+
+function updateTable(tableId, content, unit, listLimit) {
+  const sortedContent = descOrderEntriesByValue(content).slice(0,listLimit)
+  document.querySelector(tableId).innerHTML = sortedContent.map(student=>{
+    const [ name, amount ] = student
+    return buildRow(name, amount, unit)
+  }).join('')
+}
+
 function addToBookmark(ticket, ticketsDataResponse, currentBatch) {
   const bookmarkedContainer = document.getElementById('bookmarked-container')
   const id = Number(ticket.dataset.id)
@@ -66,16 +81,16 @@ function addToBookmark(ticket, ticketsDataResponse, currentBatch) {
 async function loadData(currentBatch) {
   if (!currentBatch) return
 
-  const listLimit = 5
   const ticketsDataResponse = await chrome.storage.local.get(currentBatch)
   const { tickets, students, teams } = ticketsDataResponse[currentBatch]
   const bookmarked = ticketsDataResponse[currentBatch].bookmarked || []
   const anyTickets = typeof tickets == 'object' && tickets?.length > 0
+  const listLimit = Object.keys(teams).length
 
   // update heading
   document.title = `Batch #${currentBatch}`
   document.querySelector('h1').innerText = `Batch #${currentBatch}`
-  document.querySelector('h2#all-tickets').innerText = `🎟️ All Tickets (${tickets?.length || 0})`
+  document.querySelector('h2#all-tickets').innerText = `All Tickets (${tickets?.length || 0})`
 
   if (!anyTickets) return
 
@@ -196,11 +211,8 @@ async function loadData(currentBatch) {
   })
 
   // picky
-  const sortedPicky = descOrderEntriesByValue(Object.entries(picky))
-  sortedPicky.slice(0,listLimit).forEach(picky=>{
-    const [pickyName,pickyCount] = picky
-    document.querySelector('#picky').insertAdjacentHTML('beforeend', `<li><strong>${pickyName}</strong> - ${pickyCount} tickets</li>`)
-  })
+  const arrPicky = Object.entries(picky)
+  updateTable("#picky", arrPicky, '<i class="fas fa-ticket-alt"></i>', listLimit)
 
   const arrCount = []
   const arrCommits = []
@@ -219,55 +231,33 @@ async function loadData(currentBatch) {
   }
   
   // most Tickets
-  const sortedCount = descOrderEntriesByValue(arrCount)
-  sortedCount.slice(0,listLimit).forEach(student=>{
+  const sortedCount = descOrderEntriesByValue(arrCount).slice(0,listLimit)
+  document.querySelector("#most").innerHTML = sortedCount.map(student=>{
     const [ name, amount ] = student
     const ticketsPerDay = Math.round(amount / totalDays * 10) / 10
-    document.querySelector("#most").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} tickets (${ticketsPerDay}/day)</li>`)
-  })
+    return buildRow(name, amount, `<i class="fas fa-ticket-alt"></i> (${ticketsPerDay}/day)`)
+  }).join('')
 
   // commits
-  const sortedCommits = descOrderEntriesByValue(arrCommits)
-  sortedCommits.slice(0,listLimit).forEach(student=>{
-    const [ name, amount ] = student
-    document.querySelector("#commits").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} commits</li>`)
-  })
+  updateTable("#commits", arrCommits, '<i class="fas fa-dot-circle"></i>', listLimit)
+
   // branches
-  const sortedBranches = descOrderEntriesByValue(arrBranches)
-  sortedBranches.slice(0,listLimit).forEach(student=>{
-    const [ name, amount ] = student
-    document.querySelector("#branches").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} branches</li>`)
-  })
+  updateTable("#branches", arrBranches, '<i class="fas fa-code-branch"></i>', listLimit)
 
   // wott chats
-  const sortedWott = descOrderEntriesByValue(arrWott)
-  sortedWott.slice(0,listLimit).forEach(student=>{
-    const [ name, amount ] = student
-    document.querySelector("#wott").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} chats</li>`)
-  })
+  updateTable("#wott", arrWott, '<i class="fas fa-comment-alt"></i>', listLimit)
 
   // flashcard completion
-  const sortedFlashcard = descOrderEntriesByValue(arrFlashcard)
-  sortedFlashcard.slice(0,listLimit).forEach(student=>{
-    const [ name, amount ] = student
-    document.querySelector("#flashcard").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount}%</li>`)
-  })
-
+  updateTable("#flashcard", arrFlashcard, '<i class="fas fa-percentage"></i>', listLimit)
+  
   // teams commit
+  // const arrTeamsTicket = Object.entries(teams).map(arr=> [arr[0], arr[1].commitCountCount])
   const arrTeams = Object.entries(teams).map(arr=> [arr[0], arr[1].commitCount])
-  const sortedTeams = descOrderEntriesByValue(arrTeams)
-  sortedTeams.forEach(team=>{
-    const [ name, amount ] = team
-    document.querySelector("#teams").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} commits</li>`)
-  })
-
+  updateTable("#teams", arrTeams, '<i class="fas fa-dot-circle"></i>', listLimit)
+  
   // teams tickets
   const arrTeamsTicket = Object.entries(teams).map(arr=> [arr[0], arr[1].ticketCount])
-  const sortedTeamsTicket = descOrderEntriesByValue(arrTeamsTicket)
-  sortedTeamsTicket.forEach(team=>{
-    const [ name, amount ] = team
-    document.querySelector("#teams-ticket").insertAdjacentHTML('beforeend',`<li><strong>${name}</strong> - ${amount} tickets</li>`)
-  })
+  updateTable("#teams-ticket", arrTeamsTicket, '<i class="fas fa-ticket-alt"></i>', listLimit)
 }
 
 let { currentBatch } = await chrome.storage.local.get('currentBatch')
