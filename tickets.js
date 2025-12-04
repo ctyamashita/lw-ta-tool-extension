@@ -8,6 +8,7 @@ chrome.storage.sync.get('css').then(response=>{
   })
 })
 
+let stats = []
 let totalTicketSeconds = 0
 const icons = {
   commits: '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M480-280q-73 0-127.5-45.5T284-440H80v-80h204q14-69 68.5-114.5T480-680q73 0 127.5 45.5T676-520h204v80H676q-14 69-68.5 114.5T480-280Zm0-80q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Z"/></svg>',
@@ -15,6 +16,19 @@ const icons = {
   chats: '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>',
   tickets: '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm0-160q17 0 28.5-11.5T520-480q0-17-11.5-28.5T480-520q-17 0-28.5 11.5T440-480q0 17 11.5 28.5T480-440Zm0-160q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm320 440H160q-33 0-56.5-23.5T80-240v-160q33 0 56.5-23.5T160-480q0-33-23.5-56.5T80-560v-160q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v160q-33 0-56.5 23.5T800-480q0 33 23.5 56.5T880-400v160q0 33-23.5 56.5T800-160Zm0-80v-102q-37-22-58.5-58.5T720-480q0-43 21.5-79.5T800-618v-102H160v102q37 22 58.5 58.5T240-480q0 43-21.5 79.5T160-342v102h640ZM480-480Z"/></svg>',
   percentage: '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M300-520q-58 0-99-41t-41-99q0-58 41-99t99-41q58 0 99 41t41 99q0 58-41 99t-99 41Zm0-80q25 0 42.5-17.5T360-660q0-25-17.5-42.5T300-720q-25 0-42.5 17.5T240-660q0 25 17.5 42.5T300-600Zm360 440q-58 0-99-41t-41-99q0-58 41-99t99-41q58 0 99 41t41 99q0 58-41 99t-99 41Zm0-80q25 0 42.5-17.5T720-300q0-25-17.5-42.5T660-360q-25 0-42.5 17.5T600-300q0 25 17.5 42.5T660-240Zm-444 80-56-56 584-584 56 56-584 584Z"/></svg>',
+}
+
+function formatTime(totalSeconds) {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  // Pad with leading zeros for single-digit values
+  const formattedHours = String(hours).padStart(2, '0');
+  const formattedMinutes = String(minutes).padStart(2, '0');
+  const formattedSeconds = String(seconds).padStart(2, '0');
+
+  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 }
 
 function pad(num, size) {
@@ -57,7 +71,7 @@ function descOrderEntriesByValue(arr) {
 
 function buildRow(name, amount, unit, index) {
   return `<tr>
-      <td>${index + 1}. ${name}</td>
+      <td>${index !== false ? `${index + 1}. ` : ''}${name}</td>
       <td>${amount} ${unit}</td>
       </tr>`
       // <td>${amount} <small>${unit}</small></td>
@@ -100,7 +114,7 @@ async function loadData(currentBatch) {
   // update heading
   document.title = `Batch #${currentBatch}`
   document.querySelector('h1').innerText = `Batch #${currentBatch}`
-  document.querySelector('h2#all-tickets').innerText = `All Tickets (${tickets?.length || 0})`
+  document.querySelector('h2#all-tickets .count').innerText = `(${tickets?.length || 0})`
 
   if (!anyTickets) return
 
@@ -147,7 +161,7 @@ async function loadData(currentBatch) {
 
   // finding longest ticket
   const allTickets = document.querySelectorAll('#tickets-container .popover');
-
+  stats.push(['Ticket Total', allTickets.length])
   const sortedTickets = Array.from(allTickets).sort((a,b)=>{
     const aTime = a.querySelector('.ticket-popover-time').innerHTML
     const bTime = b.querySelector('.ticket-popover-time').innerHTML
@@ -161,7 +175,7 @@ async function loadData(currentBatch) {
     totalTicketSeconds += stringTimeToIntegerSeconds(time)
     return [student, time]
   })
-  console.log(totalTicketSeconds)
+  stats.push(['Ticket Total Time', formatTime(totalTicketSeconds)])
   document.querySelector("#longest-list").innerHTML = longestListArr.map((student, index)=>{
     const [ name, amount ] = student
     return buildRow(name, amount, '', index)
@@ -281,6 +295,12 @@ async function loadData(currentBatch) {
   // teams tickets
   const arrTeamsTicket = Object.entries(teams).map(arr=> [arr[0], arr[1].ticketCount])
   updateTable("#teams-ticket", arrTeamsTicket, icons.tickets, listLimit)
+
+  // stats
+  document.querySelector("#stats").innerHTML = stats.map((item)=>{
+    const [ name, amount ] = item
+    return buildRow(name, amount, '', false)
+  }).join('')
 }
 
 let { currentBatch } = await chrome.storage.local.get('currentBatch')

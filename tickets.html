@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=alt_route" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <title>Tickets</title>
 </head>
 <body id="tickets-dashboard">
@@ -13,7 +13,13 @@
     <h1>Batch Number</h1>
     <div class="flex-container">
       <div>
-        <h2>⌛ Longest</h2>
+        <h2><span class="material-symbols-outlined">list_alt_check</span> Stats</h2>
+        <table id="stats"></table>
+      </div>
+    </div>
+    <div class="flex-container">
+      <div>
+        <h2><span class="material-symbols-outlined">receipt_long</span> Longest</h2>
         <div id="longest">
           <table id="longest-list"></table>
         </div>
@@ -22,62 +28,62 @@
     </div>
     <div class="flex-container">
       <div>
-        <h2>🎫 Most by Student</h2>
+        <h2><span class="material-symbols-outlined">confirmation_number</span> Most by Student</h2>
         <table id="most"></table>
       </div>
       <div>
-        <h2>🆘 Most by Team</h2>
+        <h2><span class="material-symbols-outlined">e911_emergency</span> Most by Team</h2>
         <table id="teams-ticket"></table>
       </div>
       <div>
-        <h2>👉 Most with Preferred TA</h2>
+        <h2><span class="material-symbols-outlined">local_activity</span> Most with Preferred TA</h2>
         <table id="picky"></table>
       </div>
       <div>
-        <h2>🤖 Most Wott Chats</h2>
+        <h2><span class="material-symbols-outlined">robot_2</span> Most Wott Chats</h2>
         <table id="wott"></table>
       </div>
       <div>
-        <h2>💯 Flashcards</h2>
+        <h2><span class="material-symbols-outlined">list_alt_check</span> Flashcards</h2>
         <table id="flashcard"></table>
       </div>
     </div>
     <h2>Projects</h2>
     <div class="flex-container">
       <div>
-        <h3>💪 Most Commits by Team</h3>
+        <h3><span class="material-symbols-outlined">mediation</span> Most Commits by Team</h3>
         <table id="teams"></table>
       </div>
       <div>
-        <h3>💾 Most Commits</h3>
+        <h3><span class="material-symbols-outlined">commit</span> Most Commits</h3>
         <table id="commits"></table>
       </div>
       <div>
-        <h3>🪾 Most Branches</h3>
+        <h3><span class="material-symbols-outlined">call_split</span> Most Branches</h3>
         <table id="branches"></table>
       </div>
     </div>
     <hr>
     <div class="flex-container">
       <div>
-        <h2>❤️ Preferred TA's</h2>
+        <h2><span class="material-symbols-outlined">favorite</span> Preferred TA's</h2>
         <div id="favorite"></div>
-        <small>⚠️ Based on tickets with more than 20 characters.</small>
+        <small><span class="material-symbols-outlined">warning</span> Based on tickets with more than 20 characters.</small>
       </div>
       <div>
-        <h2>🚀 Created by TA</h2>
+        <h2><span class="material-symbols-outlined">rocket_launch</span> Created by TA</h2>
         <div id="created"></div>
-        <small>⚠️ Based on tickets with less than 20 characters.</small>
+        <small><span class="material-symbols-outlined">warning</span> Based on tickets with less than 20 characters.</small>
       </div>
     </div>
     <hr>
     <details>
-      <summary><h2>🔖 Bookmarked Tickets</h2></summary>
+      <summary><h2><span class="material-symbols-outlined">bookmark_heart</span> Bookmarked Tickets</h2></summary>
       <div id="bookmarked-container"></div>
     </details>
     <details>
       <summary>
-        <h2 id="all-tickets">🎟️ All Tickets</h2>
+        <h2 id="all-tickets"><span class="material-symbols-outlined">stacks</span> All Tickets <span class="count">0</span></h2>
       </summary>
       <div id="tickets-container">
         No data
