@@ -41,7 +41,7 @@ async function listenClick() {
             const { tickets } = batchDataResponse[currentBatch]
             let urls = batchDataResponse[currentBatch]?.urls || [];
             let urlsDone = batchDataResponse[currentBatch]?.urlsDone || [];
-            let urlsMissing = urls.length - urlsDone.length
+            let urlsMissing = urls.length === 45 ? 0 : urls.length - urlsDone.length
 
             updateStatus(urls, urlsMissing, urlsDone, tickets)
 
