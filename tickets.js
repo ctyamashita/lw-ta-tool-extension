@@ -8,6 +8,7 @@ chrome.storage.sync.get('css').then(response=>{
   })
 })
 
+let exportData
 let stats = []
 let totalTicketSeconds = 0
 const icons = {
@@ -83,6 +84,10 @@ function updateTable(tableId, content, unit, listLimit) {
     const [ name, amount ] = student
     return buildRow(name, amount, unit, index)
   }).join('')
+  
+  return sortedContent.map(item=>{
+    return {name: item[0], value: item[1]}
+  })
 }
 
 function addToBookmark(ticket, ticketsDataResponse, currentBatch) {
@@ -110,7 +115,7 @@ async function loadData(currentBatch) {
   const bookmarked = ticketsDataResponse[currentBatch].bookmarked || []
   const anyTickets = typeof tickets == 'object' && tickets?.length > 0
   const listLimit = teams ? Object.keys(teams).length : 5
- 
+
   // update heading
   document.title = `Batch #${currentBatch}`
   document.querySelector('h1').innerText = `Batch #${currentBatch}`
@@ -169,19 +174,20 @@ async function loadData(currentBatch) {
     return stringTimeToIntegerSeconds(bTime) - stringTimeToIntegerSeconds(aTime)}
   ).slice(0,listLimit)
 
-  const longestListArr = sortedTickets.map(tkt=>{
+  const topLongestTicket = sortedTickets.map(tkt=>{
     const student = tkt.querySelector(".unstyled-link").textContent.trim()
     const time = tkt.querySelector('.ticket-popover-time').innerHTML.trim()
     totalTicketSeconds += stringTimeToIntegerSeconds(time)
     return [student, time]
   })
   stats.push(['Ticket Total Time', formatTime(totalTicketSeconds)])
-  document.querySelector("#longest-list").innerHTML = longestListArr.map((student, index)=>{
+  document.querySelector("#longest-list").innerHTML = topLongestTicket.map((student, index)=>{
     const [ name, amount ] = student
     return buildRow(name, amount, '', index)
   }).join('')
 
   const longestTicket = sortedTickets[0]
+  ticketsDataResponse[currentBatch].longestTicketIndex = Number(longestTicket.dataset.id)
   document.getElementById("longest").insertAdjacentElement('afterbegin', longestTicket.cloneNode(true))
 
   const picky = {}
@@ -268,39 +274,48 @@ async function loadData(currentBatch) {
   }
   
   // most Tickets
-  const sortedCount = descOrderEntriesByValue(arrCount).slice(0,listLimit)
-  document.querySelector("#most").innerHTML = sortedCount.map((student, index)=>{
+  const topTicketCount = descOrderEntriesByValue(arrCount).slice(0,listLimit)
+  document.querySelector("#most").innerHTML = topTicketCount.map((student, index)=>{
     const [ name, amount ] = student
     const ticketsPerDay = Math.round(amount / totalDays * 10) / 10
     return buildRow(name, amount, `${icons.tickets} (${ticketsPerDay}/day)`, index)
   }).join('')
 
   // commits
-  updateTable("#commits", arrCommits, icons.commits, listLimit)
+  const topCommits = updateTable("#commits", arrCommits, icons.commits, listLimit)
+  ticketsDataResponse[currentBatch].topCommits = topCommits
 
   // branches
-  updateTable("#branches", arrBranches, icons.branches, listLimit)
+  const topBranches = updateTable("#branches", arrBranches, icons.branches, listLimit)
+  ticketsDataResponse[currentBatch].topBranches = topBranches
 
   // wott chats
-  updateTable("#wott", arrWott, icons.chats, listLimit)
+  const topWott = updateTable("#wott", arrWott, icons.chats, listLimit)
+  ticketsDataResponse[currentBatch].topWott = topWott
 
   // flashcard completion
-  updateTable("#flashcard", arrFlashcard, icons.percentage, listLimit)
+  const topFlashcard = updateTable("#flashcard", arrFlashcard, icons.percentage, listLimit)
+  ticketsDataResponse[currentBatch].topFlashcard = topFlashcard
   
   // teams commit
   // const arrTeamsTicket = Object.entries(teams).map(arr=> [arr[0], arr[1].commitCountCount])
   const arrTeams = Object.entries(teams).map(arr=> [arr[0], arr[1].commitCount])
-  updateTable("#teams", arrTeams, icons.commits, listLimit)
-  
+  const topTeamCommit = updateTable("#teams", arrTeams, icons.commits, listLimit)
+  ticketsDataResponse[currentBatch].topTeamCommit = topTeamCommit
+
   // teams tickets
   const arrTeamsTicket = Object.entries(teams).map(arr=> [arr[0], arr[1].ticketCount])
-  updateTable("#teams-ticket", arrTeamsTicket, icons.tickets, listLimit)
+  const topTeamTicket = updateTable("#teams-ticket", arrTeamsTicket, icons.tickets, listLimit)
+  ticketsDataResponse[currentBatch].topTeamTicket = topTeamTicket
 
   // stats
   document.querySelector("#stats").innerHTML = stats.map((item)=>{
     const [ name, amount ] = item
     return buildRow(name, amount, '', false)
   }).join('')
+
+
+  chrome.storage.local.set(ticketsDataResponse)
 }
 
 let { currentBatch } = await chrome.storage.local.get('currentBatch')
@@ -311,6 +326,5 @@ if (location.search.includes('batch=')) {
   currentBatch = batch
 }
 
-loadData(currentBatch)
-
+await loadData(currentBatch)
 

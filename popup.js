@@ -4,7 +4,7 @@ chrome.runtime.connect({ name: "popup" })
 
 function updateStatus(urls, urlsMissing, urlsDone, tickets) {
     if (urls.length == 0) {
-        [ticketsIndexBtn, clearTicketsBtn,getTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+        [ticketsIndexBtn, clearTicketsBtn,getTicketsBtn, exportBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
     } else if (urlsMissing == 0) {
         // hiding collect btn
         getTicketsBtn.setAttribute('style', 'display: none')
@@ -12,7 +12,7 @@ function updateStatus(urls, urlsMissing, urlsDone, tickets) {
 
     } else if (urlsDone?.length == 0 || tickets?.length == 0) {
         // hiding tickets and clear btn
-        [ticketsIndexBtn, clearTicketsBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+        [ticketsIndexBtn, clearTicketsBtn, exportBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
         getTicketsBtn.removeAttribute('style')
         document.getElementById('collectionStatus').innerText = ''
     } else {
@@ -107,6 +107,12 @@ async function listenClick() {
                     })
                 }
             })
+
+            const filename = `${currentBatch}-data.json`;
+            const jsonStr = JSON.stringify(batchDataResponse);
+
+            exportBtn.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonStr));
+            exportBtn.setAttribute('download', filename);
         })
 
         
@@ -160,6 +166,7 @@ async function listenClick() {
     })
 }
 
+const exportBtn = document.querySelector('#export');
 const getTicketsBtn = document.getElementById('getTickets');
 const clearTicketsBtn = document.getElementById('clearTickets');
 const ticketsIndexBtn = document.getElementById('ticketsIndex');

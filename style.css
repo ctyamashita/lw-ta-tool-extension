@@ -214,8 +214,11 @@ label:not(.popover):has(:checked) {
 }
 
 #popup button,
-#popup a#statistics {
+#popup a#statistics, 
+#popup a#export {
   text-decoration: none;
+  font-size: .8rem;
+  font-weight: 700;
   border: none;
   background-color: lightgrey;
   border-radius: 8px;
@@ -231,6 +234,10 @@ label:not(.popover):has(:checked) {
 
 #popup button#clearTickets:hover {
   background-color: #d77070;
+}
+
+#popup #export:hover {
+  background-color: wheat;
 }
 
 #popup button#getTickets:hover {
@@ -278,6 +285,7 @@ label:not(.popover):has(:checked) {
 
 /* tickets page */
 #tickets-dashboard h1 {
+  text-align: center;
   padding: 2.5rem 0 1rem !important;
   border-bottom: solid;
 }
@@ -354,8 +362,8 @@ div:has(> #longest) {
 
 #longest .popover {
   margin-top: .5rem;
-  margin-left: 1rem;
-  margin-right: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
 }
 
 #longest .popover .unstyled-link {
@@ -390,7 +398,7 @@ div:has(> #longest) {
 #tickets-dashboard details summary {
   color: var(--black);
   border-radius: 1rem 1rem 0 0;
-  padding: 1rem;
+  padding: .5rem 1rem;
 }
 
 #tickets-dashboard details details[open] summary {
@@ -432,13 +440,14 @@ div:has(> #longest) {
   margin-bottom: .5rem !important;
 }
 
-#tickets-dashboard h2,
-#tickets-dashboard h3 {
+#tickets-dashboard div:has(table) > h2,
+#tickets-dashboard div:has(table) > h3 {
   padding: .75rem 1rem;
   margin: 0;
   display: flex;
   align-items: center;
   gap: .3em;
+  background-color: white;
 }
 
 #tickets-dashboard h2 {
@@ -501,4 +510,8 @@ div:has(> #longest) {
   margin-bottom: 1rem !important;
   border-radius: 8px;
   box-shadow: 2px 2px 0 4px lightgray;
+}
+
+div:has(> .ta) {
+  justify-content: space-around;
 }
