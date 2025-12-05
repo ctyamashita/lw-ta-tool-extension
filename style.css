@@ -328,8 +328,8 @@ details details {
 .flex-container {
   display: flex;
   justify-content: center;
-  gap: 2rem;
-  margin: 1rem 0 2rem;
+  gap: 1.5rem;
+  margin: 1.5rem 0 1.5rem;
   flex-wrap: wrap;
 }
 
