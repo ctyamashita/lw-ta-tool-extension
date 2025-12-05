@@ -287,7 +287,6 @@ label:not(.popover):has(:checked) {
 #tickets-dashboard h1 {
   text-align: center;
   padding: 2.5rem 0 1rem !important;
-  border-bottom: solid;
 }
 
 h2, h3 {
@@ -514,4 +513,8 @@ div:has(> #longest) {
 
 div:has(> .ta) {
   justify-content: space-around;
+}
+
+.ta {
+  text-align: center;
 }
