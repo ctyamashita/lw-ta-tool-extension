@@ -34,9 +34,12 @@ async function getCommits() {
 
   localStorage.setItem(currentBatch, JSON.stringify(data))
   await chrome.storage.local.set({[currentBatch]: data})
-  chrome.storage.local.get('collecting').then(response=>{
+  chrome.storage.local.get('collecting').then(async (response)=>{
     const { collecting } = response
-    if (collecting) window.close()
+    if (collecting) {
+      await chrome.storage.local.set({collecting: false})
+      window.close()
+    }
   })
 }
 setTimeout(() => {

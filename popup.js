@@ -61,10 +61,6 @@ async function listenClick() {
                             urlsDone = updatedResponse[currentBatch]?.urlsDone
                             urlsMissing = urls.length - urlsDone.length
                             if (/Projects/.test(urls.slice(-1)[0])) await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/project_dashboard`, active: false })
-                            
-                            setTimeout(() => {
-                                chrome.storage.local.set({collecting: false})
-                            }, 5000);
 
                             updateStatus(urls, urlsMissing, urlsDone, tickets)
                         }

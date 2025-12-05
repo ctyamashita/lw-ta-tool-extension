@@ -109,8 +109,8 @@ async function loadData(currentBatch) {
   const { tickets, students, teams } = ticketsDataResponse[currentBatch]
   const bookmarked = ticketsDataResponse[currentBatch].bookmarked || []
   const anyTickets = typeof tickets == 'object' && tickets?.length > 0
-  const listLimit = Object.keys(teams).length
-
+  const listLimit = teams ? Object.keys(teams).length : 5
+ 
   // update heading
   document.title = `Batch #${currentBatch}`
   document.querySelector('h1').innerText = `Batch #${currentBatch}`

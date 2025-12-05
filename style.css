@@ -354,6 +354,14 @@ details details {
   margin-right: 1rem;
 }
 
+#longest .popover .unstyled-link {
+  width: max-content;
+}
+
+#longest .popover .ticket-popover-header {
+  gap: 8px;
+}
+
 #favorite, #created {
   display: flex;
   justify-content: center;
