@@ -1,6 +1,5 @@
 ## Installation
 ### 1. Clone this repo
-`git clone git@github.com:ctyamashita/lw-ta-tool-extension.git`
 ### 2. On your chrome-based browser open:
   - Extensions (`chrome://extensions`)
   - Enable Developer Mode
@@ -14,3 +13,6 @@
 
 ## Tickets page
 - you can change the displayed batch by passing `?batch=<BATCH_NUMBER>` on the end of the url
+
+## Notes
+- If tickets page stops showing any info try clearing and collecting data again
