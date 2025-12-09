@@ -3,6 +3,34 @@ function extractText(array) {
   return array.map(string => string.slice(1, -1).trim()).filter(string => string.length > 0)
 }
 
+function stringTimeToIntegerSeconds(string) {
+  string = string.trim()
+  let totalSec = 0
+  const timeArr = string.split(/(h|min|sec)/).filter(el=>el.trim().length > 0)
+  // ['1','h','45','min'] or ['45','min'] or ['45','sec']
+  timeArr.forEach((item, index)=>{
+    item = Number(item)
+    if (index % 2 == 0) {
+      const unit = timeArr[index + 1]
+      switch (unit) {
+        case 'h':
+          totalSec += item * 60 * 60
+          break;
+        case 'min':
+          totalSec += item * 60
+          break;
+        case 's':
+          totalSec += item
+          break;
+      
+        default:
+          break;
+      }
+    } 
+  })
+  return totalSec
+}
+
 async function getTickets() {
   const { currentBatch } = await chrome.storage.local.get('currentBatch')
   const data = JSON.parse(localStorage.getItem(currentBatch.toString()))
@@ -36,11 +64,22 @@ async function getTickets() {
           data.students[student].ticketCount++
         }
 
+        const contentText = content.match(/<\/h4>\n.+/)[0]?.slice(5)?.trim()
+        const challenge = content.match(/<h4>[^<]*/)[0]?.slice(4)?.trim()
+        const withPreferredTA = /pref-teacher/.test(content)
+        const timeString = title.match(/\d+(min|h\d+min|sec)/)[0]
+        const timeInSec = stringTimeToIntegerSeconds(timeString)
+
         data.tickets.push({
           student: student,
           title: title,
           content: content,
-          dayLecture: dayLecture
+          dayLecture: dayLecture,
+          timeString: timeString,
+          timeInSec: timeInSec,
+          contentText: contentText,
+          withPreferredTA: withPreferredTA,
+          challenge: challenge
         })
       }
     }
