@@ -64,7 +64,7 @@ async function getTickets() {
           data.students[student].ticketCount++
         }
 
-        const contentText = content.match(/<\/h4>\n.+/)[0]?.slice(5)?.trim()
+        // const contentText = content.match(/<\/h4>[^<]+<\/div>/)[0]?.slice(5,-7)?.trim()
         const challenge = content.match(/<h4>[^<]*/)[0]?.slice(4)?.trim()
         const withPreferredTA = /pref-teacher/.test(content)
         const timeString = title.match(/\d+(min|h\d+min|sec)/)[0]
@@ -77,7 +77,7 @@ async function getTickets() {
           dayLecture: dayLecture,
           timeString: timeString,
           timeInSec: timeInSec,
-          contentText: contentText,
+          // contentText: contentText,
           withPreferredTA: withPreferredTA,
           challenge: challenge
         })

@@ -78,6 +78,18 @@ function buildRow(name, amount, unit, index) {
       // <td>${amount} <small>${unit}</small></td>
 }
 
+function buildTicket(ticket, index) {
+  return `<label class="popover" data-id="${index + 1}">
+            <input type="checkbox" class="bookmarked" >
+            <div class="popover-header">
+              ${ticket.title}
+            </div>
+            <div class="popover-body">
+              ${ticket.content.replace('fas fa-heart', 'fa-solid fa-heart')}
+            </div>
+          </label>`
+}
+
 function updateTable(tableId, content, unit, listLimit) {
   const sortedContent = descOrderEntriesByValue(content).slice(0,listLimit)
   document.querySelector(tableId).innerHTML = sortedContent.map((student, index)=>{
@@ -144,17 +156,7 @@ async function loadData(currentBatch) {
       dayNum++
     }
 
-    tabContent.insertAdjacentHTML('beforeend',
-      `<label class="popover" data-id="${index + 1}">
-        <input type="checkbox" class="bookmarked" >
-        <div class="popover-header">
-          ${ticket.title}
-        </div>
-        <div class="popover-body">
-          ${ticket.content.replace('fas fa-heart', 'fa-solid fa-heart')}
-        </div>
-      </label>`
-    )
+    tabContent.insertAdjacentHTML('beforeend', buildTicket(ticket, index))
 
     tabContent.querySelectorAll('a[href]').forEach(el=>{
       // fixing links
@@ -167,12 +169,13 @@ async function loadData(currentBatch) {
   // finding longest ticket
   const allTickets = document.querySelectorAll('#tickets-container .popover');
   stats.push(['Ticket Total', allTickets.length])
-  const sortedTickets = Array.from(allTickets).sort((a,b)=>{
-    const aTime = a.querySelector('.ticket-popover-time').innerHTML
-    const bTime = b.querySelector('.ticket-popover-time').innerHTML
 
-    return stringTimeToIntegerSeconds(bTime) - stringTimeToIntegerSeconds(aTime)}
-  ).slice(0,listLimit)
+  const  sortedTickets = Array.from(allTickets).sort((a,b)=>{
+      const aTime = a.querySelector('.ticket-popover-time').innerHTML
+      const bTime = b.querySelector('.ticket-popover-time').innerHTML
+  
+      return stringTimeToIntegerSeconds(bTime) - stringTimeToIntegerSeconds(aTime)}
+    ).slice(0,listLimit)
 
   const topLongestTicket = sortedTickets.map(tkt=>{
     const student = tkt.querySelector(".unstyled-link").textContent.trim()
