@@ -1,6 +1,6 @@
 {
     "name": "Le Wagon TA tools - BETA",
-    "version": "1.2",
+    "version": "1.4",
     "description": "THIS EXTENSION IS FOR BETA TESTING",
     "manifest_version": 3,
     "icons": {
@@ -28,7 +28,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://kitt.lewagon.com/"],
+            "matches": ["https://kitt.lewagon.com/*"],
             "js": ["scripts/copyCSS.js"]
         },
         {
