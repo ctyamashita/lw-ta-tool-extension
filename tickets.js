@@ -126,7 +126,7 @@ async function loadData(currentBatch) {
   const { tickets, students, teams } = ticketsDataResponse[currentBatch]
   const bookmarked = ticketsDataResponse[currentBatch].bookmarked || []
   const anyTickets = typeof tickets == 'object' && tickets?.length > 0
-  const listLimit = teams ? Object.keys(teams).length : 5
+  let listLimit = Math.max(Object.keys(teams).length, 5)
 
   // update heading
   document.title = `Batch #${currentBatch}`
@@ -170,7 +170,7 @@ async function loadData(currentBatch) {
   const allTickets = document.querySelectorAll('#tickets-container .popover');
   stats.push(['Ticket Total', allTickets.length])
 
-  const  sortedTickets = Array.from(allTickets).sort((a,b)=>{
+  const sortedTickets = Array.from(allTickets).sort((a,b)=>{
       const aTime = a.querySelector('.ticket-popover-time').innerHTML
       const bTime = b.querySelector('.ticket-popover-time').innerHTML
   
@@ -316,7 +316,6 @@ async function loadData(currentBatch) {
     const [ name, amount ] = item
     return buildRow(name, amount, '', false)
   }).join('')
-
 
   chrome.storage.local.set(ticketsDataResponse)
 }

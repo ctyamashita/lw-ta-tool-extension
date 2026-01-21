@@ -440,7 +440,8 @@ div:has(> #longest) {
 }
 
 #tickets-dashboard div:has(table) > h2,
-#tickets-dashboard div:has(table) > h3 {
+#tickets-dashboard div:has(table) > h3,
+#tickets-dashboard #teams-container > h2 {
   padding: .75rem 1rem;
   margin: 0;
   display: flex;
@@ -505,7 +506,8 @@ div:has(> #longest) {
 }
 
 .container > h2,
-#tickets-dashboard .container > details {
+#tickets-dashboard .container > details,
+#teams-container > h2  {
   margin-bottom: 1rem !important;
   border-radius: 8px;
   box-shadow: 2px 2px 0 4px lightgray;
@@ -517,4 +519,18 @@ div:has(> .ta) {
 
 .ta {
   text-align: center;
+}
+
+#teams-container:has(#teams:empty),
+div:has(>table:empty) {
+  display: none;
+}
+
+.fa-solid.fa-heart::before {
+  content: url(heart-icon.svg);
+  display: block;
+  line-height: 1;
+  height: 1em;
+  width: 2ch;
+  filter: invert();
 }

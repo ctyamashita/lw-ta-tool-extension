@@ -42,7 +42,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       target: {tabId: tabId, allFrames: true},
       files: [`scripts/getCommits.js`]
     })
-  } else if (tab?.url.includes('/dashboard')) {
+  } else if (tab?.url.includes('/dashboard') && !tab?.url.includes('/users')) {
     chrome.scripting.executeScript({
       target: {tabId: tabId, allFrames: true},
       files: [`scripts/getWottChats.js`]
