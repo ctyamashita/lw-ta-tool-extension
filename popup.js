@@ -78,32 +78,33 @@ async function listenClick() {
                     getTicketsBtn.setAttribute('disabled', true)
                     getTicketsBtn.innerHTML = 'Collecting'
                     // reset
-                    chrome.storage.local.set({ collecting: true })
-                    const total = urls?.length
-                    let progress = 0
-                    let i = 0
-                    urls.forEach((url, index) => {
-                        if (!urlsDone.includes(url)) {
-                            setTimeout(() => {
-                                urlsDone.push(url)
-                                chrome.tabs.create({ url: url, active: false })
-                                progress = ((index + 1) * 100) / total
-                                progressEl.dataset.progress = `${Math.round(progress)}% (${index + 1}/${total})`
-                                progressBarEl.setAttribute('style', `width: ${Math.round(progress)}%`)
-                                const dayTitle = decodeURIComponent(url.match(/path=([^&]+)/)[1])
-                                collectionStatus.innerText = dayTitle
-                                // console.log(`Progress: ${Math.round(progress)}%`)
-                                if (progress == 100) {
-                                    getTicketsBtn.removeAttribute('disabled')
-                                    progressBarEl.classList.add('completed')
-                                    setTimeout(() => {
-                                        chrome.storage.local.set({ collecting: false })
-                                        chrome.tabs.create({ url: "tickets.html" })
-                                    }, 2000);
-                                }
-                            }, (2000 * i));
-                            i++
-                        }
+                    chrome.storage.local.set({ collecting: true }).then(()=>{
+                        const total = urls?.length
+                        let progress = 0
+                        let i = 0
+                        urls.forEach((url, index) => {
+                            if (!urlsDone.includes(url)) {
+                                setTimeout(() => {
+                                    urlsDone.push(url)
+                                    chrome.tabs.create({ url: url, active: false })
+                                    progress = ((index + 1) * 100) / total
+                                    progressEl.dataset.progress = `${Math.round(progress)}% (${index + 1}/${total})`
+                                    progressBarEl.setAttribute('style', `width: ${Math.round(progress)}%`)
+                                    const dayTitle = decodeURIComponent(url.match(/path=([^&]+)/)[1])
+                                    collectionStatus.innerText = dayTitle
+                                    // console.log(`Progress: ${Math.round(progress)}%`)
+                                    if (progress == 100) {
+                                        getTicketsBtn.removeAttribute('disabled')
+                                        progressBarEl.classList.add('completed')
+                                        setTimeout(() => {
+                                            chrome.storage.local.set({ collecting: false })
+                                            chrome.tabs.create({ url: "tickets.html" })
+                                        }, 2000);
+                                    }
+                                }, (2000 * i));
+                                i++
+                            }
+                        })
                     })
                 }
             })
@@ -142,12 +143,12 @@ async function listenClick() {
     })
 
     const wottCheckbox = document.getElementById('hideWott')
-    const autoOnAfterBreakCheckbox = document.getElementById('autoOnAfterBreak')
+    // const autoOnAfterBreakCheckbox = document.getElementById('autoOnAfterBreak')
 
     chrome.storage.sync.get(["hideWott", "autoOnAfterBreak"]).then((result) => {
         // update checkbox
         wottCheckbox.checked = result.hideWott;
-        autoOnAfterBreakCheckbox.checked = result.autoOnAfterBreak;
+        // autoOnAfterBreakCheckbox.checked = result.autoOnAfterBreak;
     })
 
     wottCheckbox.addEventListener('change', (e) => {
@@ -157,13 +158,13 @@ async function listenClick() {
         })
     })
 
-    autoOnAfterBreakCheckbox.addEventListener('change', () => {
-        chrome.storage.sync.get(["autoOnAfterBreak"]).then(async (result) => {
-            const tab = await getCurrentTab()
-            chrome.storage.sync.set({ autoOnAfterBreak: !result.autoOnAfterBreak })
-            triggerScript(leWagonTab.id, 'autoOnAfterBreak')
-        })
-    })
+    // autoOnAfterBreakCheckbox.addEventListener('change', () => {
+    //     chrome.storage.sync.get(["autoOnAfterBreak"]).then(async (result) => {
+    //         const tab = await getCurrentTab()
+    //         chrome.storage.sync.set({ autoOnAfterBreak: !result.autoOnAfterBreak })
+    //         triggerScript(leWagonTab.id, 'autoOnAfterBreak')
+    //     })
+    // })
 }
 
 const exportBtn = document.querySelector('#export');

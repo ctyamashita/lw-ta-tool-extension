@@ -26,6 +26,4 @@ async function getWottChats() {
   })
 }
 
-setTimeout(() => {
-  getWottChats()
-}, 2000);
+getWottChats()
