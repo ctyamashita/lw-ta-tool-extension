@@ -51,7 +51,7 @@ async function listenClick() {
             if (urls.length == 0 || newDay) {
                 // alert('Updating past ticket days')
                 chrome.storage.local.set({lastTimeFetched: currentTime, collecting: true}).then(async()=>{
-                    chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/dashboard`, active: false })
+                    await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/dashboard`, active: false })
                     const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: false })
                     chrome.tabs.onRemoved.addListener(async (tabId, _removeInfo) => {
                         if (statisticsTab.id == tabId) {

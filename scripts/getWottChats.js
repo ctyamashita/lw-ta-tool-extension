@@ -1,14 +1,19 @@
 async function getWottChats() {
-  const studentsData = document.querySelectorAll('.dashboard-students > div');
+  const studentsData = document.querySelectorAll('.dashboard-students > div.flexbox');
   const { currentBatch } = await chrome.storage.local.get('currentBatch')
   chrome.storage.local.get(currentBatch).then(async response=>{
     studentsData.forEach(row=>{
-      const student = row.querySelector('.student-name').innerText
-      const wottCount = Number(row.querySelector('.num-column:last-child').innerText)
-      const flashcard = Number(row.querySelector('.num-column:nth-last-child(2)').innerText.slice(0,-1))
-      response[currentBatch].students[student] ||= {ticketCount: 0, wottCount: 0, flashcard: 0}
-      response[currentBatch].students[student].wottCount = wottCount
-      response[currentBatch].students[student].flashcard = flashcard
+      const student = row.querySelector('.student-name')
+      const wott = row.querySelector('.num-column:last-child')
+      const flashcard = row.querySelector('.num-column:nth-last-child(2)')
+      const wottCount = wott ? Number(wott.innerText) : 0
+      const flashcardCompletion = flashcard ? Number(flashcard.innerText.slice(0,-1)) : 0
+      if (student) {
+        const studentName = student.innerText
+        response[currentBatch].students[studentName] ||= {ticketCount: 0, wottCount: 0, flashcard: 0}
+        response[currentBatch].students[studentName].wottCount = wottCount
+        response[currentBatch].students[studentName].flashcard = flashcardCompletion
+      }
     })
 
     localStorage.setItem(currentBatch, JSON.stringify(response[currentBatch]))
@@ -23,4 +28,4 @@ async function getWottChats() {
 
 setTimeout(() => {
   getWottChats()
-}, 1000);
+}, 2000);

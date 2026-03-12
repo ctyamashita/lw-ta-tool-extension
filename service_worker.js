@@ -11,7 +11,7 @@ function validUrl(url) {
 }
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status != 'complete') return
+  if (changeInfo.status !== 'complete') return
   if (validUrl(tab?.url)) scripts.forEach(script=>triggerScript(tabId, script))
   
   const currentTab = await getCurrentTab();
