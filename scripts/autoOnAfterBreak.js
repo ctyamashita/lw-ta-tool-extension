@@ -56,7 +56,7 @@ function autoOnAfterBreak() {
                     location.reload();
                   }, 1000);
                 } else {
-                  // console.log('Remaining time:', remainingTime)
+                  console.log('Remaining time:', remainingTime)
                 }
               }
             })

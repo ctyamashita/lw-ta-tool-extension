@@ -363,6 +363,7 @@ div:has(> #longest) {
   margin-top: .5rem;
   margin-left: 2rem;
   margin-right: 2rem;
+  max-width: unset;
 }
 
 #longest .popover .unstyled-link {
