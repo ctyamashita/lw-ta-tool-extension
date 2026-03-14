@@ -1,92 +1,112 @@
-function extractText(array) {
-  if (array == undefined) return [false, false]
-  return array.map(string => string.slice(1, -1).trim()).filter(string => string.length > 0)
+// NOTE: This script is injected into Kitt pages via the service worker.
+// It relies on `scripts/storage.js` having run first to provide a `storage` helper.
+
+function safeStorage() {
+  if (window.storage) return window.storage
+  return {
+    get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+    set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+  }
 }
 
-function stringTimeToIntegerSeconds(string) {
-  string = string.trim()
-  let totalSec = 0
-  const timeArr = string.split(/(h|min|sec)/).filter(el=>el.trim().length > 0)
-  // ['1','h','45','min'] or ['45','min'] or ['45','sec']
-  timeArr.forEach((item, index)=>{
-    item = Number(item)
-    if (index % 2 == 0) {
-      const unit = timeArr[index + 1]
-      switch (unit) {
-        case 'h':
-          totalSec += item * 60 * 60
-          break;
-        case 'min':
-          totalSec += item * 60
-          break;
-        case 's':
-          totalSec += item
-          break;
-      
-        default:
-          break;
-      }
-    } 
-  })
-  return totalSec
+function parseTimeToSeconds(value) {
+  if (typeof value !== 'string') return 0
+  const match = value.match(/(\d+)\s*(h(?:\d+min)?|min|sec|s)/)
+  if (!match) return 0
+
+  const quantity = Number(match[1])
+  const unit = match[2]
+  if (!Number.isFinite(quantity)) return 0
+
+  if (unit.startsWith('h')) return quantity * 3600
+  if (unit === 'min') return quantity * 60
+  return quantity
+}
+
+function ensureBatchData(raw) {
+  const data = raw && typeof raw === 'object' ? raw : {}
+  data.tickets ||= []
+  data.students ||= {}
+  data.teams ||= {}
+  data.urls ||= []
+  data.urlsDone ||= []
+  return data
 }
 
 async function getTickets() {
-  const { currentBatch } = await chrome.storage.local.get('currentBatch')
-  const data = JSON.parse(localStorage.getItem(currentBatch.toString()))
-  data.urlsDone ||= []
-  if (!data.urlsDone.includes(location.href) && location.href !== `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`) data.urlsDone.push(location.href)
+  try {
+    const storage = safeStorage()
+    const { currentBatch } = await storage.get('currentBatch')
+    if (!currentBatch) return
 
-  if (location.href.includes('-Projects')) {
-    const teamsEl = document.querySelectorAll('.student-ticket-data')
-    teamsEl.forEach(el=>{
-      const teamName = el.querySelector('a').innerText
-      const ticketCount = Number(el.querySelector('.left-offset').innerText.replace(/[^0-9]/g, ''))
-      data.teams[teamName] ||= {ticketCount: 0}
-      data.teams[teamName].ticketCount += ticketCount
-    })
-  }
+    const raw = localStorage.getItem(String(currentBatch))
+    const data = ensureBatchData(raw ? JSON.parse(raw) : null)
 
-  const ticketsEl = document.querySelectorAll(".ticket-data")
-  const dayLecture = document.querySelector("h2").innerText
-  ticketsEl.forEach(ticket => {
-    const student = ticket?.dataset?.title?.split(/<\/?strong>/)[1]
-    const title = ticket?.dataset?.title
-    const content = ticket?.dataset?.content
-
-    const alreadyAdded = data.tickets.find(tckt => tckt?.content == content && tckt?.title == title)
-
-    if (!alreadyAdded && student && title && content) {
-      if (student) {
-        if (data.students[student] == undefined) {
-          data.students[student] = { ticketCount: 1, commitCount: 0, branchCount: 0, wottCount: 0, flashcard: 0 }
-        } else {
-          data.students[student].ticketCount++
-        }
-
-        // const contentText = content.match(/<\/h4>[^<]+<\/div>/)[0]?.slice(5,-7)?.trim()
-        const challenge = content.match(/<h4>[^<]*/)[0]?.slice(4)?.trim()
-        const withPreferredTA = /pref-teacher/.test(content)
-        const timeString = title.match(/\d+(min|h\d+min|sec)/)[0]
-        const timeInSec = stringTimeToIntegerSeconds(timeString)
-
-        data.tickets.push({
-          student: student,
-          title: title,
-          content: content,
-          dayLecture: dayLecture,
-          timeString: timeString,
-          timeInSec: timeInSec,
-          // contentText: contentText,
-          withPreferredTA: withPreferredTA,
-          challenge: challenge
-        })
-      }
+    const currentUrl = location.href
+    const isSetupPage = currentUrl === `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`
+    if (!isSetupPage && !data.urlsDone.includes(currentUrl)) {
+      data.urlsDone.push(currentUrl)
     }
-  })
 
-  localStorage.setItem(currentBatch, JSON.stringify(data))
-  return data
+    if (currentUrl.includes('-Projects')) {
+      const teamEls = document.querySelectorAll('.student-ticket-data')
+      teamEls.forEach((el) => {
+        const teamName = el.querySelector('a')?.textContent?.trim() ?? ''
+        const ticketCount = Number(el.querySelector('.left-offset')?.textContent?.replace(/[^0-9]/g, '') ?? 0)
+        if (!teamName) return
+        data.teams[teamName] ||= { ticketCount: 0 }
+        data.teams[teamName].ticketCount += ticketCount
+      })
+    }
+
+    const ticketsEls = document.querySelectorAll('.ticket-data')
+    const dayLecture = document.querySelector('h2')?.textContent?.trim() ?? ''
+
+    ticketsEls.forEach((ticket) => {
+      const title = ticket?.dataset?.title
+      const content = ticket?.dataset?.content
+      const student = title?.split(/<\/?strong>/)?.[1]?.trim()
+
+      if (!student || !title || !content) return
+
+      const alreadyAdded = data.tickets.some(
+        (tckt) => tckt?.content === content && tckt?.title === title
+      )
+      if (alreadyAdded) return
+
+      data.students[student] ||= {
+        ticketCount: 0,
+        commitCount: 0,
+        branchCount: 0,
+        wottCount: 0,
+        flashcard: 0,
+      }
+      data.students[student].ticketCount += 1
+
+      const challenge = content.match(/<h4[^>]*>([^<]*)/)?.[1]?.trim() ?? ''
+      const withPreferredTA = /pref-teacher/.test(content)
+      const timeString = title.match(/\d+\s*(?:h\d+min|min|sec|s)/)?.[0] ?? ''
+      const timeInSec = parseTimeToSeconds(timeString)
+
+      data.tickets.push({
+        student,
+        title,
+        content,
+        dayLecture,
+        timeString,
+        timeInSec,
+        withPreferredTA,
+        challenge,
+      })
+    })
+
+    localStorage.setItem(currentBatch, JSON.stringify(data))
+    await storage.set({ [currentBatch]: data })
+    return data
+  } catch (err) {
+    console.error('getTickets failed', err)
+    return null
+  }
 }
 
 getTickets()

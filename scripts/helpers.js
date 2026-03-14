@@ -1,8 +1,8 @@
 export function triggerScript(tabId, jsFile) {
-  chrome.scripting.executeScript({
-      target: {tabId: tabId, allFrames: true},
-      files: [`scripts/${jsFile}.js`]
-  });
+  return chrome.scripting.executeScript({
+    target: { tabId, allFrames: true },
+    files: [`scripts/${jsFile}.js`],
+  })
 }
 
 export async function getCurrentTab() {

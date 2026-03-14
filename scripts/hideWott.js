@@ -1,33 +1,33 @@
-function hideWott() {
-  // console.log("hideWott triggered")
-
+async function hideWott() {
   const url = location.pathname
-  // check if it's on ticket page
-  if (!/tickets\/?$/.test(url)) return;
+  if (!/tickets\/?$/.test(url)) return
 
-  chrome.storage.sync.get("hideWott").then((result) => {
-    const { hideWott } = result
-    const elWithIds = document.querySelectorAll('[id]')
-    const wottEl = Array.from(elWithIds).find(el=>el.id.includes('ticket_conversations'))
+  try {
+    const { hideWott } = await new Promise((resolve) =>
+      chrome.storage.sync.get('hideWott', resolve)
+    )
+
+    const wottEl = Array.from(document.querySelectorAll('[id]')).find((el) =>
+      el.id.includes('ticket_conversations')
+    )
+    if (!wottEl) return
+
     let wottContainer = document.querySelector('.wottContainer')
-    
-    if (wottEl == undefined) return
-
-    if (wottContainer == null) {
-      // if missing container
-      wottContainer ||= document.createElement('div')
+    if (!wottContainer) {
+      wottContainer = document.createElement('div')
       wottContainer.classList.add('wottContainer')
       wottEl.insertAdjacentElement('beforeBegin', wottContainer)
       wottContainer.append(wottEl)
     }
-    if (hideWott && wottEl) {
-      // when enabled
-      wottContainer.setAttribute('style', 'display: none')
+
+    if (hideWott) {
+      wottContainer.style.display = 'none'
     } else {
-      // when disabled
-      wottContainer.removeAttribute('style')
+      wottContainer.style.display = ''
     }
-  })
+  } catch (err) {
+    console.error('hideWott failed', err)
+  }
 }
 
 hideWott()
