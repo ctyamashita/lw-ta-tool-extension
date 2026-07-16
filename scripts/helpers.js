@@ -1,7 +1,8 @@
 export function triggerScript(tabId, jsFile) {
+  if (!Array.isArray(jsFile)) jsFile = [jsFile]
   return chrome.scripting.executeScript({
     target: { tabId, allFrames: true },
-    files: [`scripts/${jsFile}.js`],
+    files: jsFile.map(file=>`scripts/${file}.js`),
   })
 }
 

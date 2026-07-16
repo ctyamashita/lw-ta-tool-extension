@@ -1,22 +1,3 @@
-const storage = {
-  get: (keys) =>
-    new Promise((resolve, reject) => {
-      chrome.storage.local.get(keys, (result) => {
-        const err = chrome.runtime.lastError
-        if (err) return reject(err)
-        resolve(result)
-      })
-    }),
-  set: (items) =>
-    new Promise((resolve, reject) => {
-      chrome.storage.local.set(items, () => {
-        const err = chrome.runtime.lastError
-        if (err) return reject(err)
-        resolve()
-      })
-    }),
-}
-
 async function persistBatch(batchKey, batchData) {
   const payload = { [batchKey]: batchData }
   try {

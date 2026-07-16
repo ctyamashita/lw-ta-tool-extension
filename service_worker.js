@@ -1,5 +1,10 @@
 import {triggerScript, getCurrentTab} from './scripts/helpers.js'
 
+const storage = {
+  get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+  set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+}
+
 const scripts = ['storage', 'getAllDays', 'setCurrentBatch']
 
 function validUrl(url) {
@@ -32,7 +37,13 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   const currentTab = await getCurrentTab();
   const { collecting, currentBatch } = await chrome.storage.local.get(['collecting', 'currentBatch']);
 
-  if (tab?.url.includes('/day_dashboard') && tabId !== currentTab?.id && collecting) {
+  if (tab?.url === `https://kitt.lewagon.com/camps/${currentBatch}`) {
+    await runContentScripts(tabId, ['storage', 'workTime'])
+
+    
+    const data = await storage.get("time")
+    console.log(data)
+  } else if (tab?.url.includes('/day_dashboard') && tabId !== currentTab?.id && collecting) {
     // console.log('Collecting tickets from: ', tabId);
     const responses = await runContentScripts(tabId, ['storage', 'getTickets'])
     const data = responses?.[1]?.[0]?.result

@@ -1,5 +1,10 @@
 import { triggerScript, getCurrentTab, getLeWagonTab, timestamp } from './scripts/helpers.js'
 
+const storage = {
+    get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+    set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+}
+
 chrome.runtime.connect({ name: "popup" })
 
 function updateStatus(urls, urlsMissing, urlsDone, tickets) {
@@ -30,8 +35,10 @@ async function listenClick() {
     chrome.storage.local.get('currentBatch').then(async (currentBatchResponse) => {
         const { currentBatch } = currentBatchResponse
         document.getElementById('currentBatch').innerText = `Batch #${currentBatch}`
-        const { onDuty } = await chrome.storage.sync.get('onDuty')
-        if (onDuty) document.getElementById('onDuty').classList.add('on')
+        // const { onDuty } = await chrome.storage.sync.get('onDuty')
+        // if (onDuty) document.getElementById('onDuty').classList.add('on')
+        const { time } = await storage.get("time")
+        if (time) document.getElementById("workTime").innerText = time
         document.querySelector('.popup-header').setAttribute('href', `https://kitt.lewagon.com/camps/${currentBatch}/tickets`)
 
         const progressEl = document.getElementById('progress');
@@ -53,6 +60,7 @@ async function listenClick() {
                 chrome.storage.local.set({lastTimeFetched: currentTime, collecting: true}).then(async()=>{
                     await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/dashboard`, active: false })
                     const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: false })
+                    await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}`, active: false })
                     chrome.tabs.onRemoved.addListener(async (tabId, _removeInfo) => {
                         if (statisticsTab.id == tabId) {
                             // remove tab after completion
@@ -119,7 +127,7 @@ async function listenClick() {
         
         clearTicketsBtn.addEventListener('click', () => {
             if (confirm("Are you sure?") == true) {
-                triggerScript(leWagonTab.id, 'clearTickets')
+                triggerScript(leWagonTab.id, ['storage', 'clearTickets'])
                 alert(`Cleared all tickets from #${currentBatch}`)
                 window.close()
             }

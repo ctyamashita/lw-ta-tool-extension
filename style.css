@@ -387,7 +387,7 @@ div:has(> #longest) {
 
 #tickets-dashboard svg {
   fill: var(--black);
-  margin-bottom: .2em;
+  /* margin-bottom: .2em; */
 }
 
 #tickets-dashboard details summary h2, 
@@ -474,6 +474,8 @@ div:has(> #longest) {
 
 #tickets-dashboard td {
   padding: .5em;
+  font-size: 1rem;
+  align-content: center;
 }
 
 #tickets-dashboard td:first-child {
@@ -493,6 +495,13 @@ div:has(> #longest) {
   white-space: nowrap;
   border-left: solid lightgray;
   width: 10%;
+}
+
+#tickets-dashboard td:last-child p {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  margin: 0;
 }
 
 @media (max-width: 530px) {

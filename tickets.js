@@ -73,7 +73,7 @@ function descOrderEntriesByValue(arr) {
 function buildRow(name, amount, unit, index) {
   return `<tr>
       <td>${index !== false ? `${index + 1}. ` : ''}${name}</td>
-      <td>${amount} ${unit}</td>
+      <td><p>${amount} ${unit}</p></td>
       </tr>`
       // <td>${amount} <small>${unit}</small></td>
 }

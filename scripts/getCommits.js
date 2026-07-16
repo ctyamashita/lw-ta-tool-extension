@@ -1,14 +1,3 @@
-// NOTE: This script is injected into the project dashboard page via the service worker.
-// It relies on `scripts/storage.js` having run first to provide a `storage` helper.
-
-function safeStorage() {
-  if (window.storage) return window.storage
-  return {
-    get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
-    set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
-  }
-}
-
 function ensureBatchData(raw) {
   const data = raw && typeof raw === 'object' ? raw : {}
   data.tickets ||= []
