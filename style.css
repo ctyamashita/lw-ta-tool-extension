@@ -413,6 +413,7 @@ div:has(> #longest) {
 #tickets-dashboard details details[open] {
   background-color: white;
   border-radius: 1rem;
+  margin-bottom: 1rem;
 }
 
 #tickets-dashboard details summary::marker {
@@ -423,16 +424,30 @@ div:has(> #longest) {
 #bookmarked-container {
   display: flex;
   flex-direction: column;
+  align-content: baseline;
   flex-wrap: wrap;
-  height: 80vh;
+  max-height: 80vh;
   min-height: unset !important;
   gap: 1rem;
   overflow-x: auto;
   padding: 1rem;
-  width: fit-content;
+  /* width: fit-content; */
+  border: solid 2px var(--black);
+  border-radius: 0 0 1rem 1rem;
+}
+
+details:has(div:empty) {
+  pointer-events: none;    /* Blocks clicks, selections, and hover states */
+  opacity: 0.5;            /* Fades the element visually */
+  cursor: not-allowed;
+}
+
+#bookmarked-container:empty {
+  display: none;
 }
 
 #tickets-container h3 {
+  margin-left: .3rem;
   border-bottom: none;
 }
 
@@ -456,7 +471,7 @@ div:has(> #longest) {
 }
 
 #tickets-dashboard h3 {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 #tickets-dashboard ul,
@@ -543,4 +558,136 @@ div:has(>table:empty) {
   height: 1em;
   width: 2ch;
   filter: invert();
+}
+
+/* Tickets Style */
+.popover .unstyled-link {
+  text-decoration: none;
+}
+
+.popover {
+  display: block;
+  max-width: 276px;
+  font-family: "San Francisco (Numbers)", "FreightSansPro", "Helvetica", "sans-serif";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  text-align: start;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-break: normal;
+  white-space: normal;
+  word-spacing: normal;
+  line-break: auto;
+  font-size: 0.875rem;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.3rem;
+  height: fit-content;
+}
+
+.popover .popover-header {
+  padding: 8px 7px;
+  margin-bottom: 0;
+  font-size: 1rem;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+}
+
+.popover .popover-header .ticket-popover-header .ticket-popover-student {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.popover .popover-header .ticket-popover-header .ticket-popover-student a {
+  color: #474545;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  font-family: "San Francisco (Numbers)", "Kievit", "Helvetica", "sans-serif";
+}
+
+
+.popover .popover-header .ticket-popover-header {
+  color: #868686;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.popover .popover-header .ticket-popover-header .ticket-popover-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.popover h4 {
+  font-size: 20px;
+  color: #333333;
+  font-weight: 600;
+  letter-spacing: -0.03rem;
+  margin-top: 0;
+}
+
+.popover .popover-body {
+  padding: 0.5rem 0.75rem;
+  color: #212529;
+}
+
+.popover .ticket-popover-body {
+  padding: 8px;
+  font-size: 13px;
+  color: #868686;
+}
+
+.popover .ticket-popover-time {
+  font-weight: 700;
+}
+
+.popover .short-ticket {
+  color: #22A7F0;
+}
+
+.popover .long-ticket {
+  color: #D35400;
+}
+
+.popover .medium-ticket {
+  color: #F89406;
+}
+
+.popover .extra_long-ticket {
+  color: #96281B;
+}
+
+.popover .ticket-popover-body .pref-teacher-badge {
+    background-color: #D2527F;
+    display: flex;
+    align-items: center;
+    color: white;
+    border-radius: 3px;
+    padding: 4px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: auto;
+    width: fit-content;
+    margin-top: 10px;
+}
+
+.popover .ticket-popover-body .pref-teacher .popover-pref-teacher-img {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    border-radius: 50%;
+    border: 1px solid white;
 }
