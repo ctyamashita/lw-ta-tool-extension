@@ -96,7 +96,10 @@ function updateTable(tableId, content, unit, listLimit) {
     const [ name, amount ] = student
     return buildRow(name, amount, unit, index)
   }).join('')
-  
+
+  const noData = sortedContent?.map(e=>Number(e[1]))?.reduce((accumulator, currentValue) => accumulator + currentValue) === 0
+  if (noData) document.querySelector(tableId).parentElement.style.display = "none"
+
   return sortedContent.map(item=>{
     return {name: item[0], value: item[1]}
   })

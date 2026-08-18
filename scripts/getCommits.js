@@ -31,7 +31,6 @@ function parseNumbers(text, regex) {
 
 async function getCommits() {
   try {
-    const storage = safeStorage()
     const { currentBatch } = await storage.get('currentBatch')
     if (!currentBatch) return
 

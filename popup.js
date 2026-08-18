@@ -38,7 +38,21 @@ async function listenClick() {
         // const { onDuty } = await chrome.storage.sync.get('onDuty')
         // if (onDuty) document.getElementById('onDuty').classList.add('on')
         const { time } = await storage.get("time")
-        if (time) document.getElementById("workTime").innerText = time
+        const [startTimeString, endTimeString] = time.split(" - ");
+        const [startHourString, startMinuteString] = startTimeString.split(":")
+        const [endHourString, endMinuteString] = endTimeString.split(":")
+
+        const startTime = new Date;
+        startTime.setHours(Number(startHourString))
+        startTime.setMinutes(Number(startMinuteString))
+        startTime.setSeconds(0)
+
+        const endTime = new Date;
+        endTime.setHours(Number(endHourString))
+        endTime.setMinutes(Number(endMinuteString))
+        endTime.setSeconds(0)
+
+        if (time) document.getElementById("workTime").innerText = `${time} | ${((endTime - startTime)/60000)/60}h`
         document.querySelector('.popup-header').setAttribute('href', `https://kitt.lewagon.com/camps/${currentBatch}/tickets`)
 
         const progressEl = document.getElementById('progress');

@@ -3,7 +3,7 @@ async function getWorkTime() {
     const { currentBatch } = await storage.get('currentBatch')
     if (!currentBatch) return
 
-    const workTime = document.querySelector(".today .camp-day small").innerText;
+    const workTime = document.querySelector(".today .camp-day small")?.innerText;
 
     // Ensure localStorage keeps a copy for quick access
     try {

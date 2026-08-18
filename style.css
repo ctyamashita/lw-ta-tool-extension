@@ -119,7 +119,6 @@ label:not(.popover):has(:checked) {
   gap: 1rem;
   background-color: lightgray;
   border-radius: 8px;
-  width: max-content;
   padding: 0 1rem;
   text-decoration: none;
   color: var(--black);
@@ -283,6 +282,10 @@ label:not(.popover):has(:checked) {
   transform: translate(-50%, -50%);
 }
 
+#popup p:has(#workTime) {
+  margin-top: 1rem;
+}
+
 /* tickets page */
 #tickets-dashboard h1 {
   text-align: center;
@@ -291,7 +294,7 @@ label:not(.popover):has(:checked) {
 
 h2, h3 {
   padding-bottom: 8px;
-  border-bottom: solid lightgray;
+  border-bottom: solid lightgray 1px;
 }
 
 summary h2 {
