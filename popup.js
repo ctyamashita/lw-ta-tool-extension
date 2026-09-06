@@ -123,32 +123,65 @@ async function listenClick() {
                     getTicketsBtn.innerHTML = 'Collecting'
                     // reset
                     storage.set({ collecting: true }).then(()=>{
-                        const total = urls?.length
+                        const total = urls?.length + 1
                         let progress = 0
                         let i = 0
-                        urls.forEach((url, index) => {
-                            if (!urlsDone.includes(url)) {
-                                setTimeout(() => {
-                                    urlsDone.push(url)
-                                    chrome.tabs.create({ url: url, active: false })
-                                    progress = ((index + 1) * 100) / total
-                                    progressEl.dataset.progress = `${Math.round(progress)}% (${index + 1}/${total})`
+                        let currentDay = ""
+                        let firstMissing = ""
+
+                        const progressCheck = setInterval(() => {
+                            storage.get(currentBatch).then((data) => {
+                                let urlsDone = data[currentBatch]?.urlsDone || [];
+                                const missingURLS = urls.filter(url => !urlsDone.includes(url))
+                                if (firstMissing !== missingURLS[0]) {
+                                    urlsDone.push(firstMissing)
+                                    firstMissing = missingURLS[0]
+                                    chrome.tabs.create({ url: firstMissing, active: false })
+                                    progress = ((urlsDone.length) * 100) / total
+                                    if (progress > 100) progress = 100
+                                    progressEl.dataset.progress = `${Math.round(progress)}% (${urlsDone.length}/${total})`
                                     progressBarEl.setAttribute('style', `width: ${Math.round(progress)}%`)
-                                    const dayTitle = decodeURIComponent(url.match(/path=([^&]+)/)[1])
+                                    const dayTitle = decodeURIComponent(firstMissing.match(/path=([^&]+)/)[1])
                                     collectionStatus.innerText = dayTitle
-                                    // console.log(`Progress: ${Math.round(progress)}%`)
-                                    if (progress == 100) {
+
+                                    if (progress >= 100) {
                                         getTicketsBtn.removeAttribute('disabled')
                                         progressBarEl.classList.add('completed')
+                                        clearInterval(progressCheck)
                                         setTimeout(() => {
                                             storage.set({ collecting: false })
                                             chrome.tabs.create({ url: "tickets.html" })
                                         }, 2000);
                                     }
-                                }, (2000 * i));
-                                i++
-                            }
-                        })
+                                } else {
+                                    console.log("still fetching for:", firstMissing)
+                                }
+                            })
+                        }, 2000);
+
+                        // urls.forEach((url, index) => {
+                        //     if (!urlsDone.includes(url)) {
+                        //         setTimeout(() => {
+                        //             urlsDone.push(url)
+                        //             chrome.tabs.create({ url: url, active: false })
+                        //             progress = ((index + 1) * 100) / total
+                        //             progressEl.dataset.progress = `${Math.round(progress)}% (${index + 1}/${total})`
+                        //             progressBarEl.setAttribute('style', `width: ${Math.round(progress)}%`)
+                        //             const dayTitle = decodeURIComponent(url.match(/path=([^&]+)/)[1])
+                        //             collectionStatus.innerText = dayTitle
+                        //             // console.log(`Progress: ${Math.round(progress)}%`)
+                        //             if (progress == 100) {
+                        //                 getTicketsBtn.removeAttribute('disabled')
+                        //                 progressBarEl.classList.add('completed')
+                        //                 setTimeout(() => {
+                        //                     storage.set({ collecting: false })
+                        //                     chrome.tabs.create({ url: "tickets.html" })
+                        //                 }, 2000);
+                        //             }
+                        //         }, (2000 * i));
+                        //         i++
+                        //     }
+                        // })
                     })
                 }
             })

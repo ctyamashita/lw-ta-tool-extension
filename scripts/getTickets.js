@@ -81,6 +81,8 @@ async function getTickets() {
       })
     })
 
+    data.urlsDone.push(location.href)
+
     localStorage.setItem(currentBatch, JSON.stringify(data))
     await storage.set({ [currentBatch]: data })
     return data

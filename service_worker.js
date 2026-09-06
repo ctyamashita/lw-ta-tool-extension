@@ -48,8 +48,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
     if (data && data.tickets) {
       await storage.set(batchTickets)
-      chrome.tabs.remove(tabId)
     }
+    chrome.tabs.remove(tabId)
   } else if (tab?.url.includes('/project_dashboard')) {
     await runContentScripts(tabId, ['getCommits'])
   } else if (tab?.url.includes('/dashboard') && !tab?.url.includes('/users')) {
