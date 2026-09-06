@@ -10,6 +10,10 @@ function ensureBatchData(raw) {
 
 async function clearTickets() {
   try {
+    const storage = {
+      get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+      set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+    }
     const { currentBatch } = await storage.get('currentBatch')
     if (!currentBatch) return
 

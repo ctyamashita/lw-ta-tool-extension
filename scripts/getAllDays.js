@@ -3,6 +3,10 @@ async function getAllDays() {
   if (!/day_dashboard\/?$/.test(url)) return
 
   try {
+    const storage = {
+      get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+      set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+    }
     const { currentBatch } = await storage.get('currentBatch')
     if (!currentBatch) return
 

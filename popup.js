@@ -1,15 +1,14 @@
 import { triggerScript, getCurrentTab, getLeWagonTab, timestamp } from './scripts/helpers.js'
 
-const storage = {
-    get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
-    set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
-}
-
 chrome.runtime.connect({ name: "popup" })
 
 function updateStatus(urls, urlsMissing, urlsDone, tickets) {
     if (urls.length == 0) {
         [ticketsIndexBtn, clearTicketsBtn,getTicketsBtn, exportBtn].forEach(btn=>btn.setAttribute('style', 'display: none'))
+        // setTimeout(() => {
+        //     getTicketsBtn.removeAttribute('style')
+        //     document.getElementById('collectionStatus').setAttribute('style', 'display: none')
+        // }, 5000);
     } else if (urlsMissing == 0) {
         // hiding collect btn
         getTicketsBtn.setAttribute('style', 'display: none')
@@ -25,44 +24,58 @@ function updateStatus(urls, urlsMissing, urlsDone, tickets) {
     }
 }
 
+async function collectWorkingHours() {
+    const storage = {
+            get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+            set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+        } 
+    const { time } = await storage.get("time")
+    if (time) {
+        const [startTimeString, endTimeString] = time.split(" - ");
+        const [startHourString, startMinuteString] = startTimeString.split(":")
+        const [endHourString, endMinuteString] = endTimeString.split(":")
+
+        const startTime = new Date;
+        startTime.setHours(Number(startHourString))
+        startTime.setMinutes(Number(startMinuteString))
+        startTime.setSeconds(0)
+
+        const endTime = new Date;
+        endTime.setHours(Number(endHourString))
+        endTime.setMinutes(Number(endMinuteString))
+        endTime.setSeconds(0)
+
+        if (time) document.getElementById("workTime").innerText = `${time} | ${((endTime - startTime)/60000)/60}h`
+    }
+}
+
 async function listenClick() {
+    const storage = {
+        get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+        set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+    }
     const leWagonTab = await getLeWagonTab()
     if (!leWagonTab) {
         window.close()
         return alert('Please have at least one tab opened and logged on Kitt')
     }
 
-    chrome.storage.local.get('currentBatch').then(async (currentBatchResponse) => {
+    storage.get('currentBatch').then(async (currentBatchResponse) => {
         const { currentBatch } = currentBatchResponse
         document.getElementById('currentBatch').innerText = `Batch #${currentBatch}`
         // const { onDuty } = await chrome.storage.sync.get('onDuty')
         // if (onDuty) document.getElementById('onDuty').classList.add('on')
         
-        const { time } = await storage.get("time")
-        if (time) {
-            const [startTimeString, endTimeString] = time.split(" - ");
-            const [startHourString, startMinuteString] = startTimeString.split(":")
-            const [endHourString, endMinuteString] = endTimeString.split(":")
-    
-            const startTime = new Date;
-            startTime.setHours(Number(startHourString))
-            startTime.setMinutes(Number(startMinuteString))
-            startTime.setSeconds(0)
-    
-            const endTime = new Date;
-            endTime.setHours(Number(endHourString))
-            endTime.setMinutes(Number(endMinuteString))
-            endTime.setSeconds(0)
-    
-            if (time) document.getElementById("workTime").innerText = `${time} | ${((endTime - startTime)/60000)/60}h`
-            document.querySelector('.popup-header').setAttribute('href', `https://kitt.lewagon.com/camps/${currentBatch}/tickets`)
-        }
+        collectWorkingHours()
+        
+        document.querySelector('.popup-header').setAttribute('href', `https://kitt.lewagon.com/camps/${currentBatch}/tickets`)
 
         const progressEl = document.getElementById('progress');
         const progressBarEl = document.getElementById('progress-bar');
         const collectionStatus = document.getElementById('collectionStatus')
-        chrome.storage.local.get(currentBatch).then(async (batchDataResponse) => {
-            const { tickets } = batchDataResponse[currentBatch]
+        storage.get(currentBatch).then(async (batchDataResponse) => {
+            const tickets = batchDataResponse[currentBatch]?.tickets || []
+            const course = batchDataResponse[currentBatch]?.course || ""
             let urls = batchDataResponse[currentBatch]?.urls || [];
             let urlsDone = batchDataResponse[currentBatch]?.urlsDone || [];
             let urlsMissing = urls.length === 45 && urlsDone.length === 44 ? 0 : urls.length - urlsDone.length
@@ -74,9 +87,9 @@ async function listenClick() {
             const newDay = currentTime != lastTimeFetched
             if (urls.length == 0 || newDay) {
                 // alert('Updating past ticket days')
-                chrome.storage.local.set({lastTimeFetched: currentTime, collecting: true}).then(async()=>{
+                storage.set({lastTimeFetched: currentTime, collecting: true}).then(async()=>{
                     await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/dashboard`, active: false })
-                    const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: false })
+                    const statisticsTab = await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=${course === "Data Analytics" ? "01-Setup%2F01-Intro-and-Setup" : "00-Setup"}`, active: false })
                     await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}`, active: false })
                     chrome.tabs.onRemoved.addListener(async (tabId, _removeInfo) => {
                         if (statisticsTab.id == tabId) {
@@ -85,7 +98,8 @@ async function listenClick() {
                             urls = updatedResponse[currentBatch]?.urls
                             urlsDone = updatedResponse[currentBatch]?.urlsDone
                             urlsMissing = urls.length - urlsDone.length
-                            if (/Projects/.test(urls.slice(-1)[0])) await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/project_dashboard`, active: false })
+                            course = updatedResponse[currentBatch]?.course
+                            if (/Projects/.test(urls.slice(-1)[0])) await chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/project_dashboard?path=${course === "Data Analytics" ? "01-Setup%2F01-Intro-and-Setup" : "00-Setup"}`, active: false })
 
                             updateStatus(urls, urlsMissing, urlsDone, tickets)
                         }
@@ -95,15 +109,20 @@ async function listenClick() {
 
 
             getTicketsBtn.addEventListener('click', () => {
+                const storage = {
+                    get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+                    set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+                }
                 if (urls.length == 0) {
+                    const { course } = batchDataResponse[currentBatch]
                     alert("Urls collection required. Try again after the page is loaded.")
-                    chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`, active: true })
+                    chrome.tabs.create({ url: `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=${course === "Data Analytics" ? "01-Setup%2F01-Intro-and-Setup" : "00-Setup"}`, active: true })
                 } else {
                     alert("Don't change tabs or close the extension popup until it's finished")
                     getTicketsBtn.setAttribute('disabled', true)
                     getTicketsBtn.innerHTML = 'Collecting'
                     // reset
-                    chrome.storage.local.set({ collecting: true }).then(()=>{
+                    storage.set({ collecting: true }).then(()=>{
                         const total = urls?.length
                         let progress = 0
                         let i = 0
@@ -122,7 +141,7 @@ async function listenClick() {
                                         getTicketsBtn.removeAttribute('disabled')
                                         progressBarEl.classList.add('completed')
                                         setTimeout(() => {
-                                            chrome.storage.local.set({ collecting: false })
+                                            storage.set({ collecting: false })
                                             chrome.tabs.create({ url: "tickets.html" })
                                         }, 2000);
                                     }

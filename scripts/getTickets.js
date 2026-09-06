@@ -12,26 +12,19 @@ function parseTimeToSeconds(value) {
   return quantity
 }
 
-function ensureBatchData(raw) {
-  const data = raw && typeof raw === 'object' ? raw : {}
-  data.tickets ||= []
-  data.students ||= {}
-  data.teams ||= {}
-  data.urls ||= []
-  data.urlsDone ||= []
-  return data
-}
-
 async function getTickets() {
   try {
+    const storage = {
+        get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+        set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+    }
     const { currentBatch } = await storage.get('currentBatch')
     if (!currentBatch) return
 
-    const raw = localStorage.getItem(String(currentBatch))
-    const data = ensureBatchData(raw ? JSON.parse(raw) : null)
+    const data = JSON.parse(localStorage.getItem(String(currentBatch))) || storage.get(currentBatch)[currentBatch]
 
     const currentUrl = location.href
-    const isSetupPage = currentUrl === `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=00-Setup`
+    const isSetupPage = currentUrl === `https://kitt.lewagon.com/camps/${currentBatch}/tickets/day_dashboard?path=${data.course === "Data Analytics" ? "01-Setup%2F01-Intro-and-Setup" : "00-Setup"}`
     if (!isSetupPage && !data.urlsDone.includes(currentUrl)) {
       data.urlsDone.push(currentUrl)
     }

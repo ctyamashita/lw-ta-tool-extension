@@ -4,7 +4,7 @@
 
 /* global chrome */
 
-;(function () {
+function setStorage() {
   if (window.storage) return
 
   function wrapChromeStorageApi(method) {
@@ -32,5 +32,7 @@
     },
   }
 
-  window.storage = storage
-})()
+  return storage
+}
+
+window.storage = setStorage()

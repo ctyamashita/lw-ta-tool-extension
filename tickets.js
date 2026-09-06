@@ -97,7 +97,8 @@ function updateTable(tableId, content, unit, listLimit) {
     return buildRow(name, amount, unit, index)
   }).join('')
 
-  const noData = sortedContent?.map(e=>Number(e[1]))?.reduce((accumulator, currentValue) => accumulator + currentValue) === 0
+  
+  const noData = sortedContent.length === 0 || sortedContent?.map(e=>Number(e[1]))?.reduce((accumulator, currentValue) => accumulator + currentValue) === 0
   if (noData) document.querySelector(tableId).parentElement.style.display = "none"
 
   return sortedContent.map(item=>{
@@ -126,10 +127,11 @@ async function loadData(currentBatch) {
   if (!currentBatch) return
 
   const ticketsDataResponse = await chrome.storage.local.get(currentBatch)
-  const { tickets, students, teams } = ticketsDataResponse[currentBatch]
+  const { tickets, students, teams = {} } = ticketsDataResponse[currentBatch]
   const bookmarked = ticketsDataResponse[currentBatch].bookmarked || []
   const anyTickets = typeof tickets == 'object' && tickets?.length > 0
-  let listLimit = Math.max(Object.keys(teams).length, 5)
+  const numberOfTeams = Object.keys(teams).length > 0 ? Object.keys(teams).length : 1
+  let listLimit = Math.max(numberOfTeams, 5)
 
   // update heading
   document.title = `Batch #${currentBatch}`

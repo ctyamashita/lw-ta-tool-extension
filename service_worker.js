@@ -1,11 +1,6 @@
 import {triggerScript, getCurrentTab} from './scripts/helpers.js'
 
-const storage = {
-  get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
-  set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
-}
-
-const scripts = ['storage', 'getAllDays', 'setCurrentBatch']
+const scripts = ['getAllDays', 'setCurrentBatch']
 
 function validUrl(url) {
   if (!url || typeof url !== 'string') return false
@@ -31,32 +26,34 @@ async function runContentScripts(tabId, scriptsToRun) {
 }
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  const storage = {
+    get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+    set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+  }
   if (changeInfo.status !== 'complete') return
   if (validUrl(tab?.url)) await runContentScripts(tabId, scripts)
   
   const currentTab = await getCurrentTab();
-  const { collecting, currentBatch } = await chrome.storage.local.get(['collecting', 'currentBatch']);
+  const { collecting, currentBatch } = await storage.get(['collecting', 'currentBatch']);
 
   if (tab?.url === `https://kitt.lewagon.com/camps/${currentBatch}`) {
-    await runContentScripts(tabId, ['storage', 'workTime'])
+    await runContentScripts(tabId, ['workTime'])
 
-    
     const data = await storage.get("time")
-    console.log(data)
   } else if (tab?.url.includes('/day_dashboard') && tabId !== currentTab?.id && collecting) {
     // console.log('Collecting tickets from: ', tabId);
-    const responses = await runContentScripts(tabId, ['storage', 'getTickets'])
+    const responses = await runContentScripts(tabId, ['getTickets'])
     const data = responses?.[1]?.[0]?.result
     const batchTickets = { [currentBatch]: data }
 
     if (data && data.tickets) {
-      await chrome.storage.local.set(batchTickets)
+      await storage.set(batchTickets)
       chrome.tabs.remove(tabId)
     }
   } else if (tab?.url.includes('/project_dashboard')) {
-    await runContentScripts(tabId, ['storage', 'getCommits'])
+    await runContentScripts(tabId, ['getCommits'])
   } else if (tab?.url.includes('/dashboard') && !tab?.url.includes('/users')) {
-    await runContentScripts(tabId, ['storage', 'getWottChats'])
+    await runContentScripts(tabId, ['getWottChats'])
   }
 })
 
@@ -66,10 +63,14 @@ chrome.tabs.onActivated.addListener(async (event) => {
 })
 
 chrome.runtime.onConnect.addListener(async function(port) {
+  const storage = {
+    get: (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve)),
+    set: (items) => new Promise((resolve) => chrome.storage.local.set(items, resolve)),
+  }
   if (port.name === "popup") {
     port.onDisconnect.addListener(function() {
       //  console.log("popup has been closed")
-      chrome.storage.local.set({ collecting: false })
+      storage.set({ collecting: false })
     });
   }
 });
